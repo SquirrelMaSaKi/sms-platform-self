@@ -8,9 +8,9 @@ public class StrategyConstants {
     计费	fee
     路由	router
      **/
-    public final static String STRATEGY_ERROR_BLACK = "black";
-    public final static String  STRATEGY_ERROR_DIRTYWORDS = "dirtyWords";
-    public final static String STRATEGY_ERROR_LIMIT = "limit";
-    public final static String STRATEGY_ERROR_FEE = "fee";
-    public final static String STRATEGY_ERROR_ROUTER = "router";
+    public final static String STRATEGY_ERROR_BLACK = "FIVE_black";
+    public final static String  STRATEGY_ERROR_DIRTYWORDS = "FIVE_dirtyWords";
+    public final static String STRATEGY_ERROR_LIMIT = "FIVE_limit";
+    public final static String STRATEGY_ERROR_FEE = "FIVE_fee";
+    public final static String STRATEGY_ERROR_ROUTER = "FIVE_router";
 }
