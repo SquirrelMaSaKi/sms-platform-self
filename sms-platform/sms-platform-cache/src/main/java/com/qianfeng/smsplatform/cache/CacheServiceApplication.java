@@ -15,6 +15,7 @@ public class CacheServiceApplication extends SpringBootServletInitializer {
 
     @Override
     protected SpringApplicationBuilder configure(SpringApplicationBuilder application) {
+        System.err.println("1111");
         return application.sources(CacheServiceApplication.class);
     }
 }
