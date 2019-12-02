@@ -2,7 +2,7 @@ package com.qianfeng.smsplatform.search.util;
 
 import java.util.regex.Pattern;
 
-public class CheckPhone {222wadawdaXcdawd
+public class CheckPhone {
 
     /**
      * 座机电话格式验证
