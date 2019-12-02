@@ -9,7 +9,7 @@ eureka:
 #rabbitMQ配置信息
 spring:
   rabbitmq:
-    host: 127.0.0.1
-    port: 5672
+    host: 10.9.21.198
+    port: 15672
     username: guest
     password: guest
