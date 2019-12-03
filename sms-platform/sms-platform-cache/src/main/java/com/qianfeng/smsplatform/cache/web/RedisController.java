@@ -38,14 +38,23 @@ public class RedisController {
         cacheService.hmset(key,map);
     }
 
-    @ApiOperation(value = "List插入接口")
-    @PostMapping("/list/{key}/{value}")
-    public void listSet(@ApiParam(name = "key",value = "输入list的key",defaultValue = "five_list_") @PathVariable String key,
-                        @ApiParam(name = "value",value = "输入list的value",defaultValue = "damon_test") @PathVariable String list){
+    @ApiOperation(value = "String插入接口")
+    @PostMapping("/string/{key}/{value}")
+    public void listSet(@ApiParam(name = "key",value = "输入String的key",defaultValue = "five_String") @PathVariable String key,
+                        @ApiParam(name = "value",value = "输入String的value",defaultValue = "test1") @PathVariable String value){
+        cacheService.set(key,value);
+    }
 
+    @ApiOperation(value = "String查询接口")
+    @GetMapping("/string/{key}")
+    public String getList(@ApiParam(name = "key",value = "输入list的key",defaultValue = "five_String") @PathVariable String key){
+        return cacheService.get(key);
+    }
 
+    @RequestMapping("/string/{key}/{value}/{expireTime}")
+    public Boolean set(@PathVariable String key, @PathVariable Object value,@PathVariable int expireTime){
+        return cacheService.set(key, value, expireTime);
     }
 
 
-    
 }
