@@ -1,7 +1,7 @@
 # rabbitMQ配置信息
 spring:
-  rabbitmq:
-    host: 10.9.21.198
-    port: 15672
-    username: guest
-    password: guest
+                rabbitmq:
+                  host: 10.9.21.198
+                  port: 15672
+                  username: guest
+                  password: guest
