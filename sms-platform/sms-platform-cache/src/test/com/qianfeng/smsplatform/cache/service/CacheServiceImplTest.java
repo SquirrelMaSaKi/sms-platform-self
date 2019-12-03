@@ -1,17 +1,11 @@
 package com.qianfeng.smsplatform.cache.service;
 
 import com.qianfeng.smsplatform.cache.CacheServiceApplication;
-import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
-
-import java.util.HashMap;
 
 /**
  * @author damon
@@ -24,7 +18,7 @@ import java.util.HashMap;
 @WebAppConfiguration
 public class CacheServiceImplTest {
 
-    private RedisTemplate redisTemplate;
+    /*private RedisTemplate redisTemplate;
 
     @Autowired(required = false)
     public void setRedisTemplate(RedisTemplate redisTemplate) {
@@ -34,14 +28,9 @@ public class CacheServiceImplTest {
         redisTemplate.setHashKeySerializer(stringSerializer);
         redisTemplate.setHashValueSerializer(stringSerializer);
         this.redisTemplate = redisTemplate;
-    }
+    }*/
 
-    @Test
-    public void testSetAndGet(){
-        HashMap<String,Object> map = new HashMap<>();
-        map.put("name","xsh");
-        redisTemplate.opsForHash().put("test_new_template","name","xsh");
-    }
+    @Autowired CacheService cacheService;
 
 
 }
