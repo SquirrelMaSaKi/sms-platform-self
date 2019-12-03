@@ -3,11 +3,12 @@
 #    service-url:
 #      defaultZone: http://admin:123456@localhost:8000/eureka/
 
+
 # rabbitMQ配置信息
-spring:
-  rabbitmq:
-    host: 114.242.146.109
-    port: 9303
-    username: qf
-    password: qf
-    virtual-host: /qf
+#spring:
+#  rabbitmq:
+#    host: rabbitmq.qfjava.cn
+#    port: 8800
+#    username: Five
+#    password: 123
+#    virtual-host: /Five
