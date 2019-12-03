@@ -2,14 +2,23 @@ package com.qianfeng.smsplatform.search.mq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
+import com.qianfeng.smsplatform.search.service.FilterService;
+import com.qianfeng.smsplatform.search.service.Impl.BlackFilterService;
+import com.qianfeng.smsplatform.search.service.Impl.DirtyFilterService;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+import org.springframework.web.bind.annotation.PathVariable;
 
+
+import java.util.List;
 import java.util.Map;
 
 import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_PRE_SEND;
+import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_SMS_SEND_LOG;
+import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATEGY_ERROR_DIRTYWORDS;
 
 /*
 //                            _ooOoo_
@@ -50,12 +59,39 @@ import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_P
 @RabbitListener(queues = TOPIC_PRE_SEND)
 public class ReceiveMessage {
     @Autowired
-    private ObjectMapper objectMapper;
+    private Map<String, FilterService> filterServicesMap;    //所有实现了FilterService接口的类对象都会在map中,key为servicename,value为对象
+
+    @Autowired
+    private SendMessage send;
+
+    @Value("${smsplatform.filters}")
+    private String str;   //配置文件中获取出的为string字符串,需要自行分割
 
     @RabbitHandler
-        public void receive(String message) throws Exception{
-        Standard_Submit standard_submit = objectMapper.readValue(message, Standard_Submit.class);
+    public void receive(Standard_Submit message) throws Exception {
+//        Standard_Submit standard_submit = objectMapper.readValue(message, Standard_Submit.class);
+//        json字符串转对象或者转map用,如果从队列中收到的为对象,就不用转了
 
-        System.out.println("收到了消息===>"+standard_submit);
+
+//        System.out.println("收到了消息===>"+standard_submit);
+        System.out.println("errorcode:" + message.getErrorCode());
+        System.out.println(message.getMessageContent());
+
+        String[] split = str.split(",");
+
+
+        for (int i = 0; i < split.length; i++) {
+//            split[i]是配置文件或redis中的过滤器中一一获取servicename即过滤器名字
+            message = filterServicesMap.get(split[i]).filtrate(message);   //通过获取到的名字也就是key,去获取value(value是对应service的对象)
+            if (message.getErrorCode() != null) {
+                System.out.println("写入下发日志");
+                send.sendMessage(TOPIC_SMS_SEND_LOG, message);
+                return;
+            }
         }
+        System.out.println("写入下发日志");
+        send.sendMessage(TOPIC_SMS_SEND_LOG,message);
+
+
+    }
 }

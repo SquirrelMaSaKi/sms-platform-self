@@ -74,4 +74,17 @@ public class TAdminUser implements Serializable {
     public void setClientid(Integer clientid) {
         this.clientid = clientid;
     }
+
+    @Override
+    public String toString() {
+        return "TAdminUser{" +
+                "id=" + id +
+                ", password='" + password + '\'' +
+                ", usercode='" + usercode + '\'' +
+                ", email='" + email + '\'' +
+                ", realName='" + realName + '\'' +
+                ", status=" + status +
+                ", clientid=" + clientid +
+                '}';
+    }
 }

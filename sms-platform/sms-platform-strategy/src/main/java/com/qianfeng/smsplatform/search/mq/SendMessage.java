@@ -1,4 +1,4 @@
-package com.qianfeng.smsplatform.search.service;
+package com.qianfeng.smsplatform.search.mq;
 
 /*
 //                            _ooOoo_  
@@ -35,6 +35,19 @@ package com.qianfeng.smsplatform.search.service;
 *裴少泊的修仙之路
 *描述：
 */
-public class BlackFilterService {
 
+import com.qianfeng.smsplatform.common.model.Standard_Submit;
+import org.springframework.amqp.core.AmqpTemplate;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+public class SendMessage {
+    @Autowired
+    private AmqpTemplate template;
+
+
+    public void sendMessage(String queue, Standard_Submit message) {
+        template.convertAndSend(queue,message);
+    }
 }

@@ -26,7 +26,7 @@ public class RedisController {
     private CacheService cacheService;
 
     @ApiOperation(value = "HashMap查询接口")
-    @GetMapping("/hget/{key}")
+    @RequestMapping("/hget/{key}")
     public Map<Object, Object> hget(@ApiParam(name = "key",value = "输入hashmap的key",defaultValue = "damon_test") @PathVariable String key){
         return cacheService.hmget(key);
     }

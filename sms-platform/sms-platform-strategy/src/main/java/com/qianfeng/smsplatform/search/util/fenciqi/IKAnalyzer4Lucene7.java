@@ -1,13 +1,4 @@
-package com.qianfeng.smsplatform.search.config;
-
-import com.rabbitmq.client.AMQP;
-import org.springframework.amqp.core.*;
-import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.context.annotation.Bean;
-
-import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_SMS_SEND_LOG;
+package com.qianfeng.smsplatform.search.util.fenciqi;
 
 /*
 //                            _ooOoo_
@@ -44,22 +35,42 @@ import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_S
 *裴少泊的修仙之路
 *描述：
 */
-@SpringBootApplication
-public class RabbitMqConfig {
-    @Bean
-    public Queue queue(){
-        return new Queue(TOPIC_SMS_SEND_LOG,true);
+
+import org.apache.lucene.analysis.Analyzer;
+
+import java.io.Reader;
+
+/**
+ * 因为Analyzer的createComponents方法API改变了需要重新实现分析器
+ * @author THINKPAD
+ *
+ */
+public class IKAnalyzer4Lucene7 extends Analyzer {
+
+    private boolean useSmart = false;
+
+    public IKAnalyzer4Lucene7() {
+        this(false);
     }
 
-    @Bean
-    public ConnectionFactory connectionFactory(){
-        CachingConnectionFactory cachingConnectionFactory=new CachingConnectionFactory();
-        cachingConnectionFactory.setHost("rabbitmq.qfjava.cn");
-        cachingConnectionFactory.setPort(8800);
-        cachingConnectionFactory.setUsername("Five");
-        cachingConnectionFactory.setPassword("123");
-        cachingConnectionFactory.setVirtualHost("/Five");
-        return cachingConnectionFactory;
+    public IKAnalyzer4Lucene7(boolean useSmart) {
+        super();
+        this.useSmart = useSmart;
     }
+
+    public boolean isUseSmart() {
+        return useSmart;
+    }
+
+    public void setUseSmart(boolean useSmart) {
+        this.useSmart = useSmart;
+    }
+
+    @Override
+    protected TokenStreamComponents createComponents(String fieldName, Reader reader) {
+        IKTokenizer4Lucene7 tk = new IKTokenizer4Lucene7(reader,this.useSmart);
+        return new TokenStreamComponents(tk);
+    }
+
 
 }
