@@ -43,6 +43,7 @@ public class RedisController {
     public void listSet(@ApiParam(name = "key",value = "输入list的key",defaultValue = "five_list_") @PathVariable String key,
                         @ApiParam(name = "value",value = "输入list的value",defaultValue = "damon_test") @PathVariable String list){
 
+
     }
 
 
