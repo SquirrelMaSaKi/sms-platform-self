@@ -5,11 +5,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.RedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.HashMap;
-import java.util.Map;
 
 /**
  * @author damon
@@ -22,18 +24,23 @@ import java.util.Map;
 @WebAppConfiguration
 public class CacheServiceImplTest {
 
-    @Autowired
-    private CacheService cacheService;
+    private RedisTemplate redisTemplate;
+
+    @Autowired(required = false)
+    public void setRedisTemplate(RedisTemplate redisTemplate) {
+        RedisSerializer stringSerializer = new StringRedisSerializer();
+        redisTemplate.setKeySerializer(stringSerializer);
+        redisTemplate.setValueSerializer(stringSerializer);
+        redisTemplate.setHashKeySerializer(stringSerializer);
+        redisTemplate.setHashValueSerializer(stringSerializer);
+        this.redisTemplate = redisTemplate;
+    }
 
     @Test
     public void testSetAndGet(){
         HashMap<String,Object> map = new HashMap<>();
-        map.put("boy","damon");
-        map.put("girl","lin");
-        cacheService.hmset("damon-test",map);
-        Map<Object, Object> hmget = cacheService.hmget("damon-test");
-        Map<Object, Object> map2 = cacheService.hmget("damon-test");
-        System.err.println();
+        map.put("name","xsh");
+        redisTemplate.opsForHash().put("test_new_template","name","xsh");
     }
 
 
