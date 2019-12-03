@@ -32,5 +32,7 @@ public class CacheServiceImplTest {
 
     @Autowired CacheService cacheService;
 
+    public void test(){
 
+    }
 }
