@@ -83,6 +83,7 @@ public class ReceiveMessage {
         for (int i = 0; i < split.length; i++) {
 //            split[i]是配置文件或redis中的过滤器中一一获取servicename即过滤器名字
             message = filterServicesMap.get(split[i]).filtrate(message);   //通过获取到的名字也就是key,去获取value(value是对应service的对象)
+            System.out.println(i);
             if (message.getErrorCode() != null) {
                 System.out.println("写入下发日志");
                 send.sendMessage(TOPIC_SMS_SEND_LOG, message);
