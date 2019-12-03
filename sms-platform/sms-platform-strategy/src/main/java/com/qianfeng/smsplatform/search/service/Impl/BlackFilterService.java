@@ -1,4 +1,11 @@
-package com.qianfeng.smsplatform.search.service;
+package com.qianfeng.smsplatform.search.service.Impl;
+
+import com.qianfeng.smsplatform.common.model.Standard_Submit;
+import com.qianfeng.smsplatform.search.service.FilterService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATEGY_ERROR_BLACK;
 
 /*
 //                            _ooOoo_  
@@ -35,5 +42,19 @@ package com.qianfeng.smsplatform.search.service;
 *裴少泊的修仙之路
 *描述：
 */
-public class DirtyFilterService {
+@Service("BlackFilter")
+public class BlackFilterService implements FilterService {
+    private String[] str={"123123","!23123123","12123123123"};
+
+    @Override
+    public Standard_Submit filtrate(Standard_Submit message) {
+        String destMobile = message.getDestMobile();
+        for(int i=0;i<str.length;i++) {
+            if (destMobile.equals(str[i])) {
+                message.setErrorCode(STRATEGY_ERROR_BLACK);
+                return message;
+            }
+        }
+        return message;
+    }
 }

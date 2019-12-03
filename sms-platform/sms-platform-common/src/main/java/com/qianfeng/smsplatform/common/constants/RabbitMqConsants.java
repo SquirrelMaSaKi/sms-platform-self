@@ -1,6 +1,7 @@
 package com.qianfeng.smsplatform.common.constants;
 
 public class RabbitMqConsants {
+
     public final static String TOPIC_PRE_SEND = "FIVE_pre_send_sms_topic";
     //下发日志TOPIC
     public final static String TOPIC_SMS_SEND_LOG = "FIVE_sms_send_log_topic";
