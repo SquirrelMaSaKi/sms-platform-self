@@ -129,7 +129,7 @@ public class CacheServiceImpl implements CacheService {
     public boolean hmset(String key, Map<String, Object> map) {
         HashOperations hashOperations = redisTemplate.opsForHash();
         for (Map.Entry<String, Object> stringObjectEntry : map.entrySet()) {
-            hashOperations.put(key,stringObjectEntry.getKey(),stringObjectEntry.getValue());
+            hashOperations.put(key,stringObjectEntry.getKey(),stringObjectEntry.getValue()+"");
         }
         return true;
     }
