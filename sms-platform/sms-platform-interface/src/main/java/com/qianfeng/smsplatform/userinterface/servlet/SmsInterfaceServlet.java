@@ -32,7 +32,9 @@ public class SmsInterfaceServlet extends HttpServlet {
         String mobile = request.getParameter("mobile");
         String content = request.getParameter("content");
         String pwd = request.getParameter("pwd");
-        String code = checkService.check(clientID, srcID, mobile, content, pwd);
+        String remoteAddr = request.getRemoteAddr();
+        System.err.println(remoteAddr);
+        String code = checkService.check(remoteAddr,clientID, srcID, mobile, content, pwd);
         if (code.equals(InterfaceExceptionDict.RETURN_STATUS_SUCCESS)) {
             String[] split = mobile.split(",");
             for (String s : split) {
@@ -43,9 +45,11 @@ public class SmsInterfaceServlet extends HttpServlet {
                 amqpTemplate.convertAndSend(RabbitMqConsants.TOPIC_PRE_SEND, standard_submit);
                 System.err.println("发送成功");
             }
+
             System.err.println("code>>>>>>>>>" + code);
-            response.getWriter().write(code);
         }
+
+        response.getWriter().write(code);
     }
 
     @Override

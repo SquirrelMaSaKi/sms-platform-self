@@ -5,5 +5,5 @@ package com.qianfeng.smsplatform.userinterface.servcie;
  * --天神佑我：写代码，无BUG
  */
 public interface CheckService {
-    String check(String clientID, String srcID, String mobile, String content, String pwd);
+    String check(String remoteAddr,String clientID, String srcID, String mobile, String content, String pwd);
 }

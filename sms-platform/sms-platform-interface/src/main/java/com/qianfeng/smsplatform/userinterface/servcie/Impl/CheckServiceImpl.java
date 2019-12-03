@@ -19,8 +19,11 @@ public class CheckServiceImpl implements CheckService {
     @Autowired
     private CacheServcie cacheServcie;
     @Override
-    public String check(String clientID, String srcID, String mobile, String content, String pwd) {
+    public String check( String remoteAddr,String clientID, String srcID, String mobile, String content, String pwd) {
         Map<String, Object> map = cacheServcie.hGet(clientID);
+       /* Map<String, Object> map = new HashMap<>();
+        map.put("pwd", "ISMvKXpXpadDiUoOSoAfww==");
+        map.put("ipAddress", "127.0.0.1");*/
         //检查是否有ClientID
 
         if (MyStringUtils.isEmpty(clientID)) {
@@ -39,7 +42,7 @@ public class CheckServiceImpl implements CheckService {
                 String maches = "^(1[3-9])\\d{9}$";
                 for (String s : mobiles) {
                     boolean b = s.matches(maches);
-                    if (b) {
+                    if (!b) {
                         return InterfaceExceptionDict.RETURN_STATUS_MOBILE_ERROR;
                     }
                 }
@@ -73,13 +76,12 @@ public class CheckServiceImpl implements CheckService {
         }
         //匹配IP
 
-        String ip = (String)map.get("ipaddress");
-        String machesIP = "((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})(\\.((2(5[0-5]|[0-4]\\d))|[0-1]?\\d{1,2})){3}";
+        String ip = (String)map.get("ipAddress");
         if (ip == null) {
             System.err.println("Ipaddress.............................》》》》》》》》》》》》》》");
             return InterfaceExceptionDict.RETURN_STATUS_IP_ERROR;
         }
-        if (!ip.matches(machesIP)) {
+        if (!remoteAddr.equals(ip)) {
             return InterfaceExceptionDict.RETURN_STATUS_IP_ERROR;
         }
         return InterfaceExceptionDict.RETURN_STATUS_SUCCESS;

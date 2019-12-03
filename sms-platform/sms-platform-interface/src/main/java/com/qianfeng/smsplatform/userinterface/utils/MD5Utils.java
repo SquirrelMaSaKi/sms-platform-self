@@ -1,7 +1,8 @@
 package com.qianfeng.smsplatform.userinterface.utils;
 
+import sun.misc.BASE64Encoder;
+
 import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 
 /**
  * ---  2019/12/3 --- 11:41
@@ -11,13 +12,12 @@ import java.security.NoSuchAlgorithmException;
 public class MD5Utils {
     public static String toMD5(String s) {
         try {
-            MessageDigest messageDigest = MessageDigest.getInstance("MD5");
-            byte[] bytes = s.getBytes();
-            messageDigest.update(bytes);
-            byte[] digest = messageDigest.digest();
-            String string = new String(digest);
-            return string;
-        } catch (NoSuchAlgorithmException e) {
+            MessageDigest md5 = MessageDigest.getInstance("MD5");
+            BASE64Encoder base64en = new BASE64Encoder();
+            //加密后的字符串
+            String newstr = base64en.encode(md5.digest(s.getBytes("utf-8")));
+            return newstr;
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
