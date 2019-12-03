@@ -18,7 +18,6 @@ public class SmsController {
     @ResponseBody
     @RequestMapping("/sys/sms/save")
     public R addBlack(@RequestBody SmsDTO smsDTO){
-        System.out.println("这是一个发送条短信");
         return R.ok();
     }
 
