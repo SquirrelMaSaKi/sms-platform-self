@@ -101,4 +101,9 @@ public class RedisController {
     public void setString(@PathVariable String key, @PathVariable String value){
         cacheService.set(key,value);
     }
+
+    @RequestMapping("/hmset/{key}")
+    public void setHashMapByMap(@PathVariable String key,@RequestParam Map<String, Object> map){
+        cacheService.hmset(key,map);
+    }
 }

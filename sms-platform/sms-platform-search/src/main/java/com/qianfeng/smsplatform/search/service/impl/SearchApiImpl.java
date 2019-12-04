@@ -3,6 +3,7 @@ package com.qianfeng.smsplatform.search.service.impl;
 import com.qianfeng.smsplatform.search.service.SearchApi;
 import com.qianfeng.smsplatform.search.util.SearchUtil;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
+import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
@@ -32,7 +33,7 @@ public class SearchApiImpl implements SearchApi {
     private String typeName;
 
     @Autowired
-    private static RestHighLevelClient client;
+    private RestHighLevelClient client;
 
 
     @Override
@@ -51,7 +52,14 @@ public class SearchApiImpl implements SearchApi {
 
     }
 
-    public static boolean existIndex(String indexName) throws IOException {
+    @Override
+    public void deleteIndex(String indexName) throws Exception {
+        if(existIndex(indexName)){
+            DeleteIndexRequest request = new DeleteIndexRequest();
+        }
+    }
+
+    public boolean existIndex(String indexName) throws IOException {
         GetIndexRequest getIndexRequest = new GetIndexRequest();
         getIndexRequest.indices(indexName);
         return client.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
