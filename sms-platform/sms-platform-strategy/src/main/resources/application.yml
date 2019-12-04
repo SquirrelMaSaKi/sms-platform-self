@@ -10,7 +10,7 @@ spring:
 
 smsplatform:
   #  filters: smsOpIDFilter,smsBlackFilter,smsKeyWordFilter,smsFeeFilter,smsRouterFilter
-  filters: DirtyFilter,BlackFilter
+  filters: PhaseFilter,DirtyFilter,BlackFilter
   sms_send_limit:
     day: 10
     hour: 5
