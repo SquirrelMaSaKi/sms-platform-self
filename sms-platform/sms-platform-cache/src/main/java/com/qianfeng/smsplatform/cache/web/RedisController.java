@@ -87,5 +87,13 @@ public class RedisController {
         return cacheService.keys(pattern);
     }
 
+    @RequestMapping("/string/get/{key}")
+    public String getString(@PathVariable String key){
+        return cacheService.get(key);
+    }
 
+    @RequestMapping("/string/getobject/{key}")
+    public Object getObject(@PathVariable String key){
+        return cacheService.getObject(key);
+    }
 }
