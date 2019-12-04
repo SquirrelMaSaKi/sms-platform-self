@@ -18,4 +18,6 @@ public interface ChannelService {
     public List<TChannel> findALL();
 
     public DataGridResult findByPage(QueryDTO queryDTO);
+
+    List<Long> TChannel_allIds();
 }

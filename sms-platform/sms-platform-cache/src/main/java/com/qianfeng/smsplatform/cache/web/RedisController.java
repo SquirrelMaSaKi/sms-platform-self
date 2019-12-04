@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Set;
 
 /**
  * @author damon
@@ -56,5 +57,48 @@ public class RedisController {
         return cacheService.set(key, value, expireTime);
     }
 
+    @DeleteMapping("/delete/{keys}")
+    public void del(@PathVariable String... keys){
+        cacheService.del(keys);
+    }
 
+    @RequestMapping("/string/expire/{key}/{seconds}")
+    public boolean expire(String key, long seconds){
+        return cacheService.expire(key,seconds);
+    }
+
+    @RequestMapping("/string/getexpire/{key}")
+    public long getExpire(String key){
+        return cacheService.getExpire(key);
+    }
+
+    @RequestMapping("/string/incr/{key}/{delta}")
+    public long incr(String key, long delta){
+        return cacheService.incr(key,delta);
+    }
+
+    @RequestMapping("/string/decr/{key}/delta")
+    public long decr(String key, long delta){
+        return cacheService.decr(key, delta);
+    }
+
+    @RequestMapping("/string/{pattern}")
+    public Set<String> keys(String pattern){
+        return cacheService.keys(pattern);
+    }
+
+    @RequestMapping("/string/get/{key}")
+    public String getString(@PathVariable String key){
+        return cacheService.get(key);
+    }
+
+    @RequestMapping("/string/getobject/{key}")
+    public Object getObject(@PathVariable String key){
+        return cacheService.getObject(key);
+    }
+
+    @RequestMapping("/string/set/{key}/{value}")
+    public void setString(@PathVariable String key, @PathVariable String value){
+        cacheService.set(key,value);
+    }
 }

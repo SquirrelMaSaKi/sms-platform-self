@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -62,4 +63,13 @@ public class ChannelServiceImpl implements ChannelService {
         return result;
     }
 
+    @Override
+    public List<Long> TChannel_allIds() {
+        List<Long> tChannel_allIds = new ArrayList<>();
+        List<TChannel> tChannels = tChannelMapper.selectByExample(null);
+        for (TChannel tChannel : tChannels) {
+            tChannel_allIds.add(tChannel.getId());
+        }
+        return tChannel_allIds;
+    }
 }

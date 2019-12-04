@@ -99,17 +99,25 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public long incr(String key, long delta) {
-        return 0;
+        Object o = redisTemplate.opsForValue().get(key);
+        if(o instanceof Number){
+            return redisTemplate.opsForValue().increment(key, delta);
+        }
+        throw new RuntimeException("用户余额不为数字。");
     }
 
     @Override
     public long decr(String key, long delta) {
-        return 0;
+        Object o = redisTemplate.opsForValue().get(key);
+        if(o instanceof Number){
+            return redisTemplate.opsForValue().increment(key, delta);
+        }
+        throw new RuntimeException("用户余额不为数字。");
     }
 
     @Override
     public Set<String> keys(String pattern) {
-        return null;
+        return redisTemplate.keys(pattern);
     }
 
     @Override
@@ -121,7 +129,7 @@ public class CacheServiceImpl implements CacheService {
     public boolean hmset(String key, Map<String, Object> map) {
         HashOperations hashOperations = redisTemplate.opsForHash();
         for (Map.Entry<String, Object> stringObjectEntry : map.entrySet()) {
-            hashOperations.put(key,stringObjectEntry.getKey(),stringObjectEntry.getValue());
+            hashOperations.put(key,stringObjectEntry.getKey(),stringObjectEntry.getValue()+"");
         }
         return true;
     }
