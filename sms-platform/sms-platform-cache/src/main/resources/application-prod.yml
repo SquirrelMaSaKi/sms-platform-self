@@ -27,11 +27,4 @@ spring:
         # 连接池中的最小空闲连接
         min-idle: 0
       # 关闭超时时间
-      shutdown-timeout: 100
-swagger:
-  contact:
-    name: Damon
-    url: http://www.baidu.com
-    email: email@qq.com
-
-
+      shutdown-timeout: 3000
