@@ -46,7 +46,8 @@ public class SmsInterfaceServlet extends HttpServlet {
 
                 standard_submit.setClientID(Integer.parseInt(clientID));
                 standard_submit.setDestMobile(s);
-                amqpTemplate.convertAndSend(RabbitMqConsants.TOPIC_PRE_SEND,standard_submit);
+                amqpTemplate.convertAndSend(RabbitMqConsants.TOPIC_PRE_SEND, standard_submit);
+
                 System.err.println("发送成功");
             }
 

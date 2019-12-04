@@ -15,4 +15,9 @@ public class MQConfig {
     public Queue queue() {
          return new Queue(RabbitMqConsants.TOPIC_PRE_SEND);
      }
+    @Bean
+    public Queue queue1() {
+        return new Queue(RabbitMqConsants.TOPIC_PUSH_SMS_REPORT);
+    }
+
 }
