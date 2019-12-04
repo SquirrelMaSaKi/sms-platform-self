@@ -6,13 +6,15 @@ eureka:
 # Redis数据库索引（默认为0）
 spring:
   redis:
-    database: 0
+    database: 5
     # Redis服务器地址
-    host: 114.242.146.109
+    host: redis.qfjava.cn
     #集群连接示例
     #spring.redis.cluster.nodes=192.168.157.135:7000,192.168.157.135:7001,192.168.157.135:7002,192.168.157.135:7003,192.168.157.135:7004,192.168.157.135:7005
     # Redis服务器连接端口
-    port: 9302
+    port: 8400
+    password: redis001
+
     # Lettuce
     # 连接池最大连接数（使用负值表示没有限制）
     lettuce:
@@ -25,4 +27,11 @@ spring:
         # 连接池中的最小空闲连接
         min-idle: 0
       # 关闭超时时间
-      shutdown-timeout: 3000
+      shutdown-timeout: 100
+swagger:
+  contact:
+    name: Damon
+    url: http://www.baidu.com
+    email: email@qq.com
+
+
