@@ -14,5 +14,4 @@ import java.util.Map;
 public interface CacheServcie {
     @RequestMapping(value = "/cache/hget/{key}")
     public Map<String, Object> hGet(@PathVariable String key);
-
 }

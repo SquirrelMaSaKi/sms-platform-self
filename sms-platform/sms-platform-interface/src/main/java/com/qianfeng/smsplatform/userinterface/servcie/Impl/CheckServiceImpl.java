@@ -47,8 +47,6 @@ public class CheckServiceImpl implements CheckService {
                     }
                 }
             }
-
-
         } else {
             return InterfaceExceptionDict.RETURN_STATUS_MOBILE_ERROR;
         }
