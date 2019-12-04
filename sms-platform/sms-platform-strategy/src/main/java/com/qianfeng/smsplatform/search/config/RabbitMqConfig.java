@@ -7,6 +7,7 @@ import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
+import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_SMS_GATEWAY;
 import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_SMS_SEND_LOG;
 
 /*
@@ -49,6 +50,11 @@ public class RabbitMqConfig {
     @Bean
     public Queue queue(){
         return new Queue(TOPIC_SMS_SEND_LOG,true);
+    }
+
+    @Bean
+    public Queue queue1(){
+        return new Queue(TOPIC_SMS_GATEWAY,true);
     }
 
     @Bean
