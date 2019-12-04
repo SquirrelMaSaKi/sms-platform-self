@@ -9,9 +9,11 @@ import java.util.Map;
 /**
  * ---  2019/12/3 --- 8:34
  * --天神佑我：写代码，无BUG
+ * 熔断机制
  */
-@FeignClient("CACHE-SERVICE")
+@FeignClient(value = "CACHE-SERVICE", fallback = CacheServcieFallBack.class)
 public interface CacheServcie {
     @RequestMapping(value = "/cache/hget/{key}")
-    public Map<String, Object> hGet(@PathVariable String key);
+    public Map<Object, Object> hGet(@PathVariable String key);
+
 }

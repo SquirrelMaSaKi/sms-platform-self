@@ -107,7 +107,7 @@
         <profile>
             <id>local</id>
             <activation>
-                <activeByDefault>true</activeByDefault>
+                <activeByDefault>false</activeByDefault>
             </activation>
             <properties>
                 <profileActive>local</profileActive>
@@ -127,7 +127,7 @@
         <profile>
             <id>prod</id>
             <activation>
-                <activeByDefault>false</activeByDefault>
+                <activeByDefault>true</activeByDefault>
             </activation>
             <properties>
                 <profileActive>prod</profileActive>

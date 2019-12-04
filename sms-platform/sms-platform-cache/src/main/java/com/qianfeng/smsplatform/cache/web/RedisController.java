@@ -33,8 +33,8 @@ public class RedisController {
 
     @ApiOperation(value = "HashMap插入接口")
     @PostMapping("/hset/{key}/{param_json}")
-    public void hmset(@ApiParam(name = "key",value = "输入hashmap的key",defaultValue = "damon_test") @PathVariable("key") String key,
-                      @ApiParam(name = "param_json",value = "输入hashmap的map",defaultValue = "{\"name\":\"damon\",\"age\":\"18\"}") @PathVariable("param_json") String param_json){
+    public void hmset(@ApiParam(name = "key",value = "输入hashmap的key",defaultValue = "damon_test") @PathVariable String key,
+                      @ApiParam(name = "param_json",value = "输入hashmap的map",defaultValue = "{\"name\":\"damon\",\"age\":\"18\"}") @PathVariable String param_json){
         JSONObject map = JSONObject.parseObject(param_json);
         cacheService.hmset(key,map);
     }
@@ -87,4 +87,23 @@ public class RedisController {
         return cacheService.keys(pattern);
     }
 
+    @RequestMapping("/string/get/{key}")
+    public String getString(@PathVariable String key){
+        return cacheService.get(key);
+    }
+
+    @RequestMapping("/string/getobject/{key}")
+    public Object getObject(@PathVariable String key){
+        return cacheService.getObject(key);
+    }
+
+    @RequestMapping("/string/set/{key}/{value}")
+    public void setString(@PathVariable String key, @PathVariable String value){
+        cacheService.set(key,value);
+    }
+
+    @RequestMapping("/hmset/{key}")
+    public void setHashMapByMap(@PathVariable String key,@RequestParam Map<String, Object> map){
+        cacheService.hmset(key,map);
+    }
 }

@@ -1,14 +1,17 @@
 package com.qianfeng.smsplatform.search.mq;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.service.FilterService;
 import com.qianfeng.smsplatform.search.service.Impl.BlackFilterService;
 import com.qianfeng.smsplatform.search.service.Impl.DirtyFilterService;
+import feign.RequestLine;
+import jdk.nashorn.internal.runtime.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -54,8 +57,9 @@ import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATE
 *裴少泊的修仙之路
 *描述：
 */
+@Slf4j
 @Component
-@RabbitListener(queues = TOPIC_PRE_SEND)
+@RabbitListener(queues = TOPIC_PRE_SEND,concurrency = "10")   //多线程
 public class ReceiveMessage {
     @Autowired
     private Map<String, FilterService> filterServicesMap;    //所有实现了FilterService接口的类对象都会在map中,key为servicename,value为对象
@@ -73,8 +77,9 @@ public class ReceiveMessage {
 
 
 //        System.out.println("收到了消息===>"+standard_submit);
-        System.out.println("errorcode:" + message.getErrorCode());
-        System.out.println(message.getMessageContent());
+        log.info("errorcode:" + message.getErrorCode());
+        log.info(message.getMessageContent());
+        log.info(String.valueOf(message.getClientID()));
 
         String[] split = str.split(",");
 
@@ -82,14 +87,13 @@ public class ReceiveMessage {
         for (int i = 0; i < split.length; i++) {
 //          split[i]是配置文件或redis中的过滤器中一一获取servicename即过滤器名字
             message = filterServicesMap.get(split[i]).filtrate(message);   //通过获取到的名字也就是key,去获取value(value是对应service的对象)
-            System.out.println(i);
             if (message.getErrorCode() != null) {
                 System.out.println("写入下发日志");
                 send.sendMessage(TOPIC_SMS_SEND_LOG, message);
                 return;
             }
         }
-        System.out.println("写入下发日志");
+        System.out.println("传入网关队列");
         send.sendMessage(TOPIC_SMS_GATEWAY,message);
 
 

@@ -1,5 +1,5 @@
 ﻿server:
-  port: 8080
+  port: 8081
 
 eureka:
   client:
@@ -9,7 +9,8 @@ eureka:
 #rabbitMQ配置信息
 spring:
   rabbitmq:
-    host: rabbitmq.qfjava.cn
-    port: 8800
-    username: guest
-    password: guest
+    host: 10.9.21.198
+    port: 5672
+    username: Five
+    password: 123
+    virtual-host: /Five
