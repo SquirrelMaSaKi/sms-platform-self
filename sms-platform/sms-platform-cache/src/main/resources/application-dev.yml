@@ -27,4 +27,4 @@ spring:
         min-idle: 0
       # 关闭超时时间
       shutdown-timeout: 100
-    password: redis001
+    password: redis0011

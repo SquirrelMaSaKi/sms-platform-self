@@ -96,4 +96,9 @@ public class RedisController {
     public Object getObject(@PathVariable String key){
         return cacheService.getObject(key);
     }
+
+    @RequestMapping("/string/set/{key}/{value}")
+    public void setString(@PathVariable String key, @PathVariable String value){
+        cacheService.set(key,value);
+    }
 }
