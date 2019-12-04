@@ -1,19 +1,19 @@
 package com.qianfeng.smsplatform.search.service.Impl;
 
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
+import com.qianfeng.smsplatform.search.feign.CacheService;
 import com.qianfeng.smsplatform.search.service.FilterService;
 import com.qianfeng.smsplatform.search.util.AnalyzerUtil;
 import com.qianfeng.smsplatform.search.util.fenciqi.IKAnalyzer4Lucene7;
 import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.Token;
 import org.apache.lucene.analysis.TokenStream;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.util.ArrayList;
 import java.util.List;
 
+import static com.qianfeng.smsplatform.common.constants.CacheConstants.CACHE_PREFIX_DIRTYWORDS;
 import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATEGY_ERROR_DIRTYWORDS;
 
 /*
@@ -53,7 +53,9 @@ import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATE
 */
 @Service("DirtyFilter")
 public class DirtyFilterService implements FilterService {
-    private String[] str={"卧槽","造反","打劫","撕票"};
+//    private String[] str={"卧槽","造反","打劫","撕票"};
+    @Autowired
+    private CacheService cacheService;
 
     @Override
     public Standard_Submit filtrate(Standard_Submit message) {
@@ -67,17 +69,19 @@ public class DirtyFilterService implements FilterService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         System.out.println(list);
 
         for (int i = 0; i < list.size(); i++) {
-            for (int j = 0; j < str.length; j++) {
-                if (list.get(i).equals(str[j])) {
-                    System.out.println("你输入了不法词汇");
-                    message.setErrorCode(STRATEGY_ERROR_DIRTYWORDS);
-                    return message;
-                }
+            String prex=CACHE_PREFIX_DIRTYWORDS+list.get(i);
+            System.out.println(prex);
+            System.out.println(1+cacheService.findByKey(prex));
+               if(cacheService.findByKey(prex)!=null) {
+                   message.setErrorCode(STRATEGY_ERROR_DIRTYWORDS);
+                   return message;
+               }
             }
-        }
+
         return message;
     }
 }

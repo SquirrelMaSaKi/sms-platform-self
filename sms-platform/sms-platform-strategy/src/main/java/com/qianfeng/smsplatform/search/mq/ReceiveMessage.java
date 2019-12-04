@@ -4,12 +4,14 @@ import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.service.FilterService;
 import com.qianfeng.smsplatform.search.service.Impl.BlackFilterService;
 import com.qianfeng.smsplatform.search.service.Impl.DirtyFilterService;
+import feign.RequestLine;
 import jdk.nashorn.internal.runtime.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.PathVariable;
 
@@ -75,9 +77,9 @@ public class ReceiveMessage {
 
 
 //        System.out.println("收到了消息===>"+standard_submit);
-        log.error("errorcode:" + message.getErrorCode());
-        log.error(message.getMessageContent());
-        log.error("result",String.valueOf(message.getClientID()));
+        log.info("errorcode:" + message.getErrorCode());
+        log.info(message.getMessageContent());
+        log.info(String.valueOf(message.getClientID()));
 
         String[] split = str.split(",");
 
