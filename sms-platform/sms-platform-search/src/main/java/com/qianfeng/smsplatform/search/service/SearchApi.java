@@ -13,4 +13,10 @@ public interface SearchApi {
      * @throws Exception
      */
     void createIndex() throws Exception;
+
+    /**
+     * 删除es 索引， 为空时抛出异常
+     * @throws Exception
+     */
+    void deleteIndex(String indexName) throws Exception;
 }
