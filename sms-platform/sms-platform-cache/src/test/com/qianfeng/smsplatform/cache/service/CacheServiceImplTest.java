@@ -92,4 +92,14 @@ public class CacheServiceImplTest {
 
     }
 
+
+    @Test
+    public void test2(){
+        cacheService.set("aaaa",100000);
+    }
+
+    @Test
+    public void get(){
+        System.out.println(cacheService.get("aaaa"));
+    }
 }
