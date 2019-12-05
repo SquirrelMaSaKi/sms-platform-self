@@ -73,10 +73,10 @@ public class DirtyFilterService implements FilterService {
         System.out.println(list);
 
         for (int i = 0; i < list.size(); i++) {
-            String prex=CACHE_PREFIX_DIRTYWORDS+list.get(i);
-            System.out.println(prex);
-            System.out.println(1+cacheService.findByKey(prex));
-               if(cacheService.findByKey(prex)!=null) {
+            String key=CACHE_PREFIX_DIRTYWORDS+list.get(i);
+            System.out.println(key);
+            System.out.println("脏词查询为"+cacheService.findByKey(key));
+               if(cacheService.findByKey(key)!=null) {
                    message.setErrorCode(STRATEGY_ERROR_DIRTYWORDS);
                    return message;
                }
