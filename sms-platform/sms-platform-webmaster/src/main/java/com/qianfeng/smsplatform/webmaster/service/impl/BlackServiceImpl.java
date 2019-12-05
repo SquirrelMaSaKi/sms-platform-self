@@ -82,7 +82,7 @@ public class BlackServiceImpl implements BlackService {
         //批量放入缓存
         for (TBlackList tBlackList : tBlackLists) {
             String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_BLACK + tBlackList.getMobile());
-            if (string==null || string.trim().length() == 0) {
+            if (string==null || string.trim().length() == 0 || string.equals("null")) {
                 cacheFeign.setString(CacheConstants.CACHE_PREFIX_BLACK+tBlackList.getMobile(), "1");
             }
         }

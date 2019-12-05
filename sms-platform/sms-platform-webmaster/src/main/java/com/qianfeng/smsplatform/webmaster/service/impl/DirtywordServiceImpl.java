@@ -81,7 +81,7 @@ public class DirtywordServiceImpl implements DirtywordService {
         //同步到缓存
         for (TDirtyword tDirtyword : tDirtywords) {
             String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_DIRTYWORDS + tDirtyword.getDirtyword());
-            if (string==null || string.trim().length()==0) {
+            if (string==null || string.trim().length()==0 || string.equals("null")) {
                 cacheFeign.setString(CacheConstants.CACHE_PREFIX_DIRTYWORDS+tDirtyword.getDirtyword(), "1");
             }
         }

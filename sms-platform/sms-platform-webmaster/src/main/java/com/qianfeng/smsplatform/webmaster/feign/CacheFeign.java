@@ -44,4 +44,7 @@ public interface CacheFeign {
 
     @RequestMapping("/cache/string/get/{key}")
     String getString(@PathVariable("key") String key);
+
+    @RequestMapping("/cache/string/set/object/{key}/{value}")
+     void setStringObject(@PathVariable("key") String key, @PathVariable("value") Object value);
 }
