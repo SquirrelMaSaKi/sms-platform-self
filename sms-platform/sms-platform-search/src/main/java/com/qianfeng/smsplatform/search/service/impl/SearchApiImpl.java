@@ -1,10 +1,12 @@
 package com.qianfeng.smsplatform.search.service.impl;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qianfeng.smsplatform.search.service.SearchApi;
 import com.qianfeng.smsplatform.search.util.SearchUtil;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
+import org.elasticsearch.action.support.master.AcknowledgedResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
@@ -25,6 +27,9 @@ import java.io.IOException;
  */
 @Service
 public class SearchApiImpl implements SearchApi {
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     private Logger logger = LoggerFactory.getLogger(SearchApiImpl.class);
     @Value("${elasticsearch.index.name}")
@@ -55,7 +60,11 @@ public class SearchApiImpl implements SearchApi {
     @Override
     public void deleteIndex(String indexName) throws Exception {
         if(existIndex(indexName)){
-            DeleteIndexRequest request = new DeleteIndexRequest();
+            DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
+            AcknowledgedResponse delete =  client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
+            logger.error("删除index的结果是：{}",objectMapper.writeValueAsString(delete));
+        }else {
+            logger.error("删除失败，不存在指定索引");
         }
     }
 

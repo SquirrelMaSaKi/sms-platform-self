@@ -1,10 +1,13 @@
 package com.qianfeng.smsplatform.search.service.Impl;
 
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
+import com.qianfeng.smsplatform.search.feign.CacheService;
 import com.qianfeng.smsplatform.search.service.FilterService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import static com.qianfeng.smsplatform.common.constants.CacheConstants.CACHE_PREFIX_BLACK;
 import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATEGY_ERROR_BLACK;
 
 /*
@@ -42,18 +45,23 @@ import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATE
 *裴少泊的修仙之路
 *描述：
 */
+@Slf4j
 @Service("BlackFilter")
 public class BlackFilterService implements FilterService {
-    private String[] str={"123123","!23123123","12123123123"};
+    //    private String[] str={"123123","!23123123","12123123123"};
+    @Autowired
+    private CacheService cacheService;
 
     @Override
     public Standard_Submit filtrate(Standard_Submit message) {
-        String destMobile = message.getDestMobile();
-        for(int i=0;i<str.length;i++) {
-            if (destMobile.equals(str[i])) {
-                message.setErrorCode(STRATEGY_ERROR_BLACK);
-                return message;
-            }
+
+        String key = CACHE_PREFIX_BLACK + message.getDestMobile();
+        String black = cacheService.findByKey(key);
+
+        if (black != null) {
+            log.error("您是大老黑");
+            message.setErrorCode(STRATEGY_ERROR_BLACK);
+            return message;
         }
         return message;
     }

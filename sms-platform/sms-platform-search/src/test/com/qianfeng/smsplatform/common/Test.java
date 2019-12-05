@@ -26,4 +26,10 @@ public class Test {
     public void testCreateIndex() throws Exception {
         searchApi.createIndex();
     }
+
+    @org.junit.Test
+    public void testDeleteIndex() throws Exception {
+        searchApi.deleteIndex("sms_submit_log_five");
+    }
+
 }
