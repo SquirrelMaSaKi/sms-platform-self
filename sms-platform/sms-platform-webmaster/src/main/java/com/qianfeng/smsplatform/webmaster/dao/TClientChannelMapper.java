@@ -2,10 +2,9 @@ package com.qianfeng.smsplatform.webmaster.dao;
 
 import com.qianfeng.smsplatform.webmaster.pojo.TClientChannel;
 import com.qianfeng.smsplatform.webmaster.pojo.TClientChannelExample;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
-
-import org.apache.ibatis.annotations.Param;
 
 public interface TClientChannelMapper {
     long countByExample(TClientChannelExample example);
@@ -29,4 +28,6 @@ public interface TClientChannelMapper {
     int updateByPrimaryKeySelective(TClientChannel record);
 
     int updateByPrimaryKey(TClientChannel record);
+
+    TClientChannel selectByClientId(Long clientid);
 }

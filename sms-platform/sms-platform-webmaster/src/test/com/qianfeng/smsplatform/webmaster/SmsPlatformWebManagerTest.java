@@ -2,10 +2,13 @@ package com.qianfeng.smsplatform.webmaster;
 
 import com.alibaba.fastjson.JSONObject;
 import com.qianfeng.smsplatform.common.constants.CacheConstants;
+import com.qianfeng.smsplatform.webmaster.dao.TClientChannelMapper;
 import com.qianfeng.smsplatform.webmaster.feign.CacheFeign;
 import com.qianfeng.smsplatform.webmaster.pojo.TClientBusiness;
+import com.qianfeng.smsplatform.webmaster.pojo.TClientChannel;
 import com.qianfeng.smsplatform.webmaster.service.ChannelService;
 import com.qianfeng.smsplatform.webmaster.service.ClientBusinessService;
+import com.qianfeng.smsplatform.webmaster.service.ClientChannelService;
 import com.qianfeng.smsplatform.webmaster.util.JsonUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,12 +30,13 @@ public class SmsPlatformWebManagerTest {
     private ChannelService channelService;
 
     @Autowired
-    private ClientBusinessService clientBusinessService;
+    private ClientChannelService clientChannelService;
+
+    @Autowired
+    private TClientChannelMapper tClientChannelMapper;
 
     @Autowired
     private CacheFeign cacheFeign;
-
-    private Logger logger = LoggerFactory.getLogger(SmsPlatformWebManagerTest.class);
 
     @Test
     public void testFindAllChannelIds() {
@@ -45,6 +49,7 @@ public class SmsPlatformWebManagerTest {
     @Test
     public void testAddClient() {
         TClientBusiness tClientBusiness = new TClientBusiness();
+        tClientBusiness.setId((long) 15);
         tClientBusiness.setCorpname("aaa");
         tClientBusiness.setUsercode("gp");
         tClientBusiness.setPwd("gp");
@@ -55,14 +60,8 @@ public class SmsPlatformWebManagerTest {
         tClientBusiness.setUsertype((byte) 2);
         tClientBusiness.setState(1);
         tClientBusiness.setMobile("13456785678");
-        Map<String, String> stringStringMap = JsonUtils.objectToMap(tClientBusiness);
-        String s = JSONObject.toJSONString(stringStringMap);
-        System.out.println(s);
-        System.out.println(CacheConstants.CACHE_PREFIX_CLIENT+1+"");
-        cacheFeign.hmset(CacheConstants.CACHE_PREFIX_CLIENT+3+"", s);
-
-        //int i = clientBusinessService.addClientBusiness(tClientBusiness);
-        //log.debug("插入数据：" + i);
+        Map<String, Object> stringStringMap = JsonUtils.object2Map(tClientBusiness);
+        cacheFeign.setHashMapByMap(CacheConstants.CACHE_PREFIX_CLIENT+tClientBusiness.getId(), stringStringMap);
     }
 
     @Test
@@ -74,5 +73,13 @@ public class SmsPlatformWebManagerTest {
             System.err.println(key);
             System.err.println(value);
         }
+    }
+
+    @Test
+    public void testFindClientChannelByClientId() {
+//        TClientChannel byClientId = clientChannelService.findByClientId((long) 0);
+//        System.err.println(byClientId.getPrice());
+        TClientChannel tClientChannel = tClientChannelMapper.selectByClientId((long) 0);
+        System.err.println(tClientChannel.getPrice());
     }
 }

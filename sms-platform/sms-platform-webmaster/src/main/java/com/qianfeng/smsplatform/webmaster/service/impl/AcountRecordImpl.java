@@ -2,10 +2,12 @@ package com.qianfeng.smsplatform.webmaster.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.qianfeng.smsplatform.common.constants.CacheConstants;
 import com.qianfeng.smsplatform.webmaster.dao.TAcountRecordMapper;
 import com.qianfeng.smsplatform.webmaster.dao.TClientBusinessMapper;
 import com.qianfeng.smsplatform.webmaster.dto.DataGridResult;
 import com.qianfeng.smsplatform.webmaster.dto.QueryDTO;
+import com.qianfeng.smsplatform.webmaster.feign.CacheFeign;
 import com.qianfeng.smsplatform.webmaster.pojo.TAcountRecord;
 import com.qianfeng.smsplatform.webmaster.pojo.TAcountRecordExample;
 import com.qianfeng.smsplatform.webmaster.pojo.TClientBusiness;
@@ -26,6 +28,9 @@ public class AcountRecordImpl implements AcountRecordService {
     @Autowired
     private TClientBusinessMapper tClientBusinessMapper;
 
+    @Autowired
+    private CacheFeign cacheFeign;
+
 
     //初始化费用数据到缓存
     @Override
@@ -34,6 +39,9 @@ public class AcountRecordImpl implements AcountRecordService {
         tAcountRecord.setPaidvalue(paidvalue);
         tAcountRecord.setCreatetime(new Date());
         int i = tAcountRecordMapper.insertSelective(tAcountRecord);
+
+        //更新缓存
+        //cacheFeign.set(CacheConstants.CACHE_PREFIX_CUSTOMER_FEE+tAcountRecord.getPaidvalue(), tAcountRecord.getPaidvalue());
         return i;
     }
 

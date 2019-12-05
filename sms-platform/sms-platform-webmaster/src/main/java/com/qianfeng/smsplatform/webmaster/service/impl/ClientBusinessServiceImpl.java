@@ -40,25 +40,35 @@ public class ClientBusinessServiceImpl implements ClientBusinessService {
         String md5PASS = build.toUpperCase();
         tClientBusiness.setPwd(md5PASS);
 
-        //持久层已经获得返回的主键
+        //先更新到数据库
         int i = tClientBusinessMapper.insertSelective(tClientBusiness);
-        Map<String, String> map1 = JsonUtils.objectToMap(tClientBusiness);
 
-        //客户信息缓存更新
-        String jsonString = JSON.toJSONString(map1);
-        cacheFeign.hmset(CacheConstants.CACHE_PREFIX_CLIENT+i, jsonString);
+        //转为map
+        Map<String, Object> map = JsonUtils.object2Map(tClientBusiness);
+
+        //然后客户信息缓存更新
+        cacheFeign.setHashMapByMap(CacheConstants.CACHE_PREFIX_CLIENT+tClientBusiness.getId(), map);
         return i;
     }
 
     @Override
     public int delClientBusiness(Long id) {
+        //先删除缓存中数据
+        cacheFeign.del(CacheConstants.CACHE_PREFIX_CLIENT+id);
+
+        //然后删除数据库
         int i = tClientBusinessMapper.deleteByPrimaryKey(id);
         return i;
     }
 
     @Override
     public int updateClientBusiness(TClientBusiness tClientBusiness) {
+        //先更新数据库
         int i =  tClientBusinessMapper.updateByPrimaryKey(tClientBusiness);
+
+        //更新缓存
+        Map<String, Object> map = JsonUtils.object2Map(tClientBusiness);
+        cacheFeign.setHashMapByMap(CacheConstants.CACHE_PREFIX_CLIENT+tClientBusiness.getId(), map);
         return i;
     }
 
@@ -89,6 +99,13 @@ public class ClientBusinessServiceImpl implements ClientBusinessService {
 //                int i = paidValueStr/1000;
 //                tClientBusiness.setPaidValueStr(i+"元");
 //            }
+
+            //批量放入缓存
+            Map<String, Object> map = cacheFeign.hGet(CacheConstants.CACHE_PREFIX_CLIENT + id);
+            if (map==null || map.size() == 0) {
+                Map<String, Object> map1 = JsonUtils.object2Map(tClientBusiness);
+                cacheFeign.setHashMapByMap(CacheConstants.CACHE_PREFIX_CLIENT+id, map1);
+            }
         }
         PageInfo<TClientBusiness> info = new PageInfo<>(tClientBusinesses);
         long total = info.getTotal();
