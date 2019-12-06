@@ -112,6 +112,6 @@ public class CacheServiceImplTest {
 
     @Test
     public void set(){
-        cacheService.set("aaaa", "aaa", 5);
+        cacheService.set("aaadfefa", "aaa", 60);
     }
 }
