@@ -1,6 +1,5 @@
 package com.qianfeng.smsplatform.cache.web;
 
-import com.alibaba.fastjson.JSONObject;
 import com.qianfeng.smsplatform.cache.service.CacheService;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -33,11 +32,11 @@ public class RedisController {
 
     @ApiOperation(value = "HashMap插入接口")
     @PostMapping("/hset/{key}/{param_json}")
-    public void hmset(@ApiParam(name = "key",value = "输入hashmap的key",defaultValue = "damon_test") @PathVariable String key,
-                      @ApiParam(name = "param_json",value = "输入hashmap的map",defaultValue = "{\"name\":\"damon\",\"age\":\"18\"}") @PathVariable String param_json){
-        JSONObject map = JSONObject.parseObject(param_json);
+    public void hmset(@ApiParam(name = "key",value = "输入hashmap的key",defaultValue = "damon_test") @RequestParam("key") String key,
+                      @ApiParam(name = "param_json",value = "输入hashmap的map",defaultValue = "{\"name\":\"damon\",\"age\":\"18\"}") @RequestBody Map map){
         cacheService.hmset(key,map);
     }
+
 
     @ApiOperation(value = "String插入接口")
     @PostMapping("/string/{key}/{value}")
