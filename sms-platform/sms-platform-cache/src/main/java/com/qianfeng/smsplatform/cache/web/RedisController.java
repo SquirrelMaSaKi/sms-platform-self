@@ -82,8 +82,8 @@ public class RedisController {
         return cacheService.decr(key, delta);
     }
 
-    @RequestMapping("/string/{pattern}")
-    public Set<String> keys(@PathVariable String pattern){
+    @RequestMapping("/keys")
+    public Set<String> keys(@RequestParam String pattern){
         return cacheService.keys(pattern);
     }
 
