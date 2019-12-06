@@ -9,7 +9,7 @@ public class StrategyConstants {
     路由	router
      **/
     public final static String STRATEGY_ERROR_BLACK = "FIVE_black";
-    public final static String  STRATEGY_ERROR_DIRTYWORDS = "FIVE_dirtyWords";
+    public final static String STRATEGY_ERROR_DIRTYWORDS = "FIVE_dirtyWords";
     public final static String STRATEGY_ERROR_LIMIT = "FIVE_limit";
     public final static String STRATEGY_ERROR_FEE = "FIVE_fee";
     public final static String STRATEGY_ERROR_ROUTER = "FIVE_router";

@@ -19,6 +19,4 @@ public interface AcountRecordService {
     public List<TAcountRecord> findAll();
 
     public DataGridResult findByPage(QueryDTO queryDTO);
-
-
 }

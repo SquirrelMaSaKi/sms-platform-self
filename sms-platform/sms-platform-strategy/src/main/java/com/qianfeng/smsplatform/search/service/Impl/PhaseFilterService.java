@@ -56,7 +56,13 @@ public class PhaseFilterService implements FilterService {
     @Override
     public Standard_Submit filtrate(Standard_Submit message) {
         String number = message.getDestMobile();
-        String phase = number.substring(0, 7);   //含前不含后,截取号码号段
+        String phase=null;
+        if (number.length()>7) {
+            phase = number.substring(0, 7);  //含前不含后,截取号码号段
+        } else{
+            log.error("号码长度不够7位，不合法");
+            return message;
+        }
 
         String key = CACHE_PREFIX_PHASE + phase;  //拼接key
         String provAndcity = cacheService.findByKey(key);

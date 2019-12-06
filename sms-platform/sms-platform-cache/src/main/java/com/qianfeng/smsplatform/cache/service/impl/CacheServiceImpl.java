@@ -132,4 +132,11 @@ public class CacheServiceImpl implements CacheService {
         }
         return true;
     }
+
+//    @Override
+//    public void hset(String key, Map<String,String> map) {
+//        for (Map.Entry<String, String> stringStringEntry : map.entrySet()) {
+//            redisTemplate.opsForHash().put(key, stringStringEntry.getKey(), stringStringEntry.getValue());
+//        }
+//    }
 }

@@ -1,12 +1,16 @@
-package com.qianfeng.smsplatform.search.feign;
+package com.qianfeng.smsplatform.search.service.Impl;
 
-import feign.Param;
-import feign.RequestLine;
-import org.springframework.cloud.openfeign.FeignClient;
+import com.qianfeng.smsplatform.common.model.Standard_Submit;
+import com.qianfeng.smsplatform.search.feign.CacheService;
+import com.qianfeng.smsplatform.search.service.FilterService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+
+import static com.qianfeng.smsplatform.common.constants.CacheConstants.CACHE_PREFIX_CUSTOMER_FEE;
+import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATEGY_ERROR_FEE;
 
 /*
 //                            _ooOoo_  
@@ -43,10 +47,24 @@ import org.springframework.web.bind.annotation.RequestMapping;
 *裴少泊的修仙之路
 *描述：
 */
-@FeignClient("CACHE-SERVICE")
-public interface CacheService {
-    @RequestMapping("/cache/string/{key}")
-    public String findByKey(@PathVariable("key") String key);
-    @PostMapping("/cache/string/{key}/{value}")
-    public void setFee(@PathVariable("key") String key,@PathVariable("value") String fee);
+@Slf4j
+@Service("MoneyFilter")
+public class MoneyFilterService implements FilterService {
+    @Autowired
+    private CacheService cacheService;
+
+    @Override
+    public Standard_Submit filtrate(Standard_Submit message) {
+        String key=CACHE_PREFIX_CUSTOMER_FEE+message.getClientID();
+        String fee = cacheService.findByKey(key);
+        log.error("余额"+fee);
+        long l = Long.parseLong(fee);
+        if(l-50>=0){
+            cacheService.setFee(key,String.valueOf(l-50));
+            return message;
+        }else{
+            message.setErrorCode(STRATEGY_ERROR_FEE);
+            return message;
+        }
+    }
 }
