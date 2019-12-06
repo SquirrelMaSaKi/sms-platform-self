@@ -36,6 +36,7 @@ package com.qianfeng.smsplatform.search.mq;
 *描述：
 */
 
+import com.qianfeng.smsplatform.common.model.Standard_Report;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,5 +50,9 @@ public class SendMessage {
 
     public void sendMessage(String queue, Standard_Submit message) {
         template.convertAndSend(queue,message);
+    }
+
+    public void sendMessage2(String queue, Standard_Report report){
+        template.convertAndSend(queue,report);
     }
 }
