@@ -94,12 +94,19 @@ public class CacheServiceImplTest {
 
 
     @Test
-    public void test2(){
-        cacheService.set("aaaa",100000);
+    public void testSet(){
+        HashMap map = new HashMap();
+        map.put("pwd","666");
+        map.put("ipAddress","10.9.21.230");
+        map.put("url","http://10.9.21.230:9091/client/receive");
+        map.put("isReturnStatus","1");
+
+        cacheService.hmset("9278",map );
     }
 
     @Test
     public void get(){
-        System.out.println(cacheService.get("aaaa"));
+        System.out.println(cacheService.get("9278"));
+        System.err.println();
     }
 }

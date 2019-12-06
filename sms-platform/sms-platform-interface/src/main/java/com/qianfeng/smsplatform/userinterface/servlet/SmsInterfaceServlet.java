@@ -43,9 +43,10 @@ public class SmsInterfaceServlet extends HttpServlet {
                 Standard_Submit standard_submit = new Standard_Submit();
                 //1 代表是http发送方式
                 standard_submit.setSource(1);
-
+                standard_submit.setSrcSequenceId(Integer.parseInt(srcID));
                 standard_submit.setClientID(Integer.parseInt(clientID));
                 standard_submit.setDestMobile(s);
+                standard_submit.setMessageContent(content);
                 amqpTemplate.convertAndSend(RabbitMqConsants.TOPIC_PRE_SEND, standard_submit);
 
                 System.err.println("发送成功");
