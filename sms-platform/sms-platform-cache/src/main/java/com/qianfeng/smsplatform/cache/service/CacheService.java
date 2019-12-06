@@ -6,7 +6,7 @@ import java.util.Set;
 public interface CacheService {
     Boolean set(String key, Object value, int expireTime);
 
-    Boolean set(String key, String value, int expireTime);
+    Boolean set(String key, long value, int expireTime);
 
     Boolean set(String key, Object value);
 

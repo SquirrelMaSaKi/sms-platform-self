@@ -55,17 +55,23 @@ public class MoneyFilterService implements FilterService {
 
     @Override
     public Standard_Submit filtrate(Standard_Submit message) {
-        String key=CACHE_PREFIX_CUSTOMER_FEE+message.getClientID();
+        String key = CACHE_PREFIX_CUSTOMER_FEE + message.getClientID();
         String fee = cacheService.findByKey(key);
-        log.error("余额"+fee);
-        long l = Long.parseLong(fee);
-        if(l-50>=0){
-            cacheService.setFee(key,String.valueOf(l-50));
-            log.error("余额过滤器：余额充足");
-            return message;
-        }else{
-            message.setErrorCode(STRATEGY_ERROR_FEE);
-            return message;
+        log.error("余额" + fee);
+        long l=0;
+        if (fee!=null && !fee.equals("null")) {
+            l= Long.parseLong(fee);
+
+            if (l - 50 >= 0) {
+                cacheService.setFee(key, String.valueOf(l - 50));
+                log.error("余额过滤器：余额充足");
+                return message;
+            } else {
+                message.setErrorCode(STRATEGY_ERROR_FEE);
+                return message;
+            }
         }
+        message.setErrorCode(STRATEGY_ERROR_FEE);
+        return message;
     }
 }

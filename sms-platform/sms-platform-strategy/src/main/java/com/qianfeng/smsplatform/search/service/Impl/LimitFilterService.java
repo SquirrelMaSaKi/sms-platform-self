@@ -50,33 +50,43 @@ public class LimitFilterService implements FilterService {
     @Autowired
     private CacheService cacheService;
 
+
     @Override
     public Standard_Submit filtrate(Standard_Submit message) {
         String messageContent = message.getMessageContent();
         int clientID = message.getClientID();
         String destMobile = message.getDestMobile();
-        String key1 = CACHE_PREFIX_SMS_LIMIT_FIVE_MINUTE + MD5Util.md5(messageContent + clientID + destMobile);
-        String key2 = CACHE_PREFIX_SMS_LIMIT_HOUR + MD5Util.md5(messageContent + clientID + destMobile);
-        String key3 = CACHE_PREFIX_SMS_LIMIT_DAY + MD5Util.md5(messageContent + clientID + destMobile);
-        String countMinute = cacheService.findByKey(key1);
-        String countHour = cacheService.findByKey(key2);
-        String countDay = cacheService.findByKey(key3);
+        String keyMinute = CACHE_PREFIX_SMS_LIMIT_FIVE_MINUTE + MD5Util.md5(messageContent + clientID + destMobile);
+        String keyHour = CACHE_PREFIX_SMS_LIMIT_HOUR + MD5Util.md5(messageContent + clientID + destMobile);
+        String keyDay = CACHE_PREFIX_SMS_LIMIT_DAY + MD5Util.md5(messageContent + clientID + destMobile);
 
-        if (countMinute != null && !countMinute.equals("null")) {   //fastjson太傻逼，redis存的都是"null"字符串，而不是null
-            int countMinute2 = Integer.parseInt(countMinute);
-            if (countMinute2 < 3) {
-                cacheService.setLimitTime(key1, String.valueOf(countMinute2 + 1), (int) System.currentTimeMillis() / 1000 + 5*60);
-                return message;
+//        Long resultMinute = (Long) cacheService.findByKey2(keyMinute);
+//        Long resultHour = (Long) cacheService.findByKey2(keyHour);
+//        Long resultDay = (Long) cacheService.findByKey2(keyDay);
+
+        Check(10, keyDay, message, 1 * 24 * 60 * 60);
+        Check(5, keyHour, message, 1 * 60 * 60);
+        Check(3, keyMinute, message, 5 * 60);
+
+        return message;
+    }
+
+
+    public void Check(int count, String key, Standard_Submit message, int expiretime) {
+        String result=String.valueOf(cacheService.findByKey2(key));
+
+        if (result != null && !result.equals("null")) {
+            long result1 = Long.parseLong(result);
+            if (result1 < count) {
+                cacheService.addOrsub(key, 1);
             } else {
                 message.setErrorCode(STRATEGY_ERROR_LIMIT);
-                return message;
             }
         } else {
-            cacheService.setLimitTime(key1, String.valueOf(1),  60);
-            return message;
+            cacheService.setLimitTime(key, 1, expiretime);
         }
 
-
-
     }
+
 }
+
