@@ -12,6 +12,8 @@ import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * @author damon
@@ -65,6 +67,7 @@ public class Test {
         HashMap map = new HashMap();
         map.put("cityId",5);
         String json = objectMapper.writeValueAsString(map);
-        searchApi.search(json);
+        List<Map> search = searchApi.search(json);
+        System.err.println();
     }
 }

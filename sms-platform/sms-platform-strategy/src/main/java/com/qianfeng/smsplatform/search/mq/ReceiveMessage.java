@@ -1,5 +1,6 @@
 package com.qianfeng.smsplatform.search.mq;
 
+import com.qianfeng.smsplatform.common.model.Standard_Report;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.service.FilterService;
 import com.qianfeng.smsplatform.search.service.Impl.BlackFilterService;
@@ -67,6 +68,9 @@ public class ReceiveMessage {
     @Autowired
     private SendMessage send;
 
+    @Autowired
+    private Standard_Report report;
+
     @Value("${smsplatform.filters}")
     private String str;   //配置文件中获取出的为string字符串,需要自行分割
 
@@ -77,7 +81,7 @@ public class ReceiveMessage {
 
 
 //        System.out.println("收到了消息===>"+standard_submit);
-        log.info("errorcode:" + message.getErrorCode());
+        log.info("message:" + message);
         log.info(message.getMessageContent());
         log.info(String.valueOf(message.getClientID()));
 
@@ -91,6 +95,13 @@ public class ReceiveMessage {
             message = filterServicesMap.get(split[i]).filtrate(message);   //通过获取到的名字也就是key,去获取value(value是对应service的对象)
             if (message.getErrorCode() != null) {
                 System.out.println("写入下发日志");
+                report.setClientID(message.getClientID());
+                report.setErrorCode(message.getErrorCode());
+                report.setMobile(message.getDestMobile());
+                report.setClientID(message.getClientID());
+                report.setSrcID(message.getSrcSequenceId());
+
+                send.sendMessage2(TOPIC_PUSH_SMS_REPORT,report);
                 send.sendMessage(TOPIC_SMS_SEND_LOG, message);
                 return;
             }

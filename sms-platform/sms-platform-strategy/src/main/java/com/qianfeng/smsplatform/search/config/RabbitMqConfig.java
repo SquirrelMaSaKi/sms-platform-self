@@ -1,5 +1,6 @@
 package com.qianfeng.smsplatform.search.config;
 
+import com.qianfeng.smsplatform.common.model.Standard_Report;
 import com.rabbitmq.client.AMQP;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
@@ -24,7 +25,7 @@ import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_S
 //                     | \_| ''\---/'' | |
 //                      \ .-\__ `-` ___/-. /
 //                   ___`. .' /--.--\ `. . __
-//                ."" '< `.___\_<|>_/___.' >'"".
+//                ."" '< `.___\_<|>_/___.' >'"".                                                                                    
 //               | | : `- \`.;`\ _ /`;.`/ - ` : | |
 //                 \ \ `-. \_ __\ /__ _/ .-` / /
 //         ======`-.____`-.___\_____/___.-`____.-'======
@@ -47,6 +48,11 @@ import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_S
 */
 @SpringBootApplication
 public class RabbitMqConfig {
+    @Bean
+    public Standard_Report report(){
+        return new Standard_Report();
+    }
+
     @Bean
     public Queue queue(){
         return new Queue(TOPIC_SMS_SEND_LOG,true);
