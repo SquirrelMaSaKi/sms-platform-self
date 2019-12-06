@@ -3,19 +3,12 @@ package com.qianfeng.smsplatform.search.service.Impl;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.feign.CacheService;
 import com.qianfeng.smsplatform.search.service.FilterService;
-import com.qianfeng.smsplatform.search.util.AnalyzerUtil;
-import com.qianfeng.smsplatform.search.util.fenciqi.IKAnalyzer4Lucene7;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.lucene.analysis.Analyzer;
-import org.apache.lucene.analysis.TokenStream;
+import com.qianfeng.smsplatform.search.util.MD5Util;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
-import java.util.List;
-
-import static com.qianfeng.smsplatform.common.constants.CacheConstants.CACHE_PREFIX_DIRTYWORDS;
-import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATEGY_ERROR_DIRTYWORDS;
+import static com.qianfeng.smsplatform.common.constants.CacheConstants.*;
+import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATEGY_ERROR_LIMIT;
 
 /*
 //                            _ooOoo_  
@@ -52,39 +45,38 @@ import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATE
 *裴少泊的修仙之路
 *描述：
 */
-@Slf4j
-@Service("DirtyFilter")
-public class DirtyFilterService implements FilterService {
-//    private String[] str={"卧槽","造反","打劫","撕票"};
+@Service("LimitFilter")
+public class LimitFilterService implements FilterService {
     @Autowired
     private CacheService cacheService;
 
     @Override
     public Standard_Submit filtrate(Standard_Submit message) {
         String messageContent = message.getMessageContent();
-        Analyzer ik = new IKAnalyzer4Lucene7();
-        List list = null;
-        try {
-            TokenStream ts = ik.tokenStream("content", messageContent);
-            System.out.println("IKAnalyzer中文分词器 细粒度切分，中文分词效果：");
-            list = AnalyzerUtil.doToken(ts);
-        } catch (IOException e) {
-            e.printStackTrace();
+        int clientID = message.getClientID();
+        String destMobile = message.getDestMobile();
+        String key1 = CACHE_PREFIX_SMS_LIMIT_FIVE_MINUTE + MD5Util.md5(messageContent + clientID + destMobile);
+        String key2 = CACHE_PREFIX_SMS_LIMIT_HOUR + MD5Util.md5(messageContent + clientID + destMobile);
+        String key3 = CACHE_PREFIX_SMS_LIMIT_DAY + MD5Util.md5(messageContent + clientID + destMobile);
+        String countMinute = cacheService.findByKey(key1);
+        String countHour = cacheService.findByKey(key2);
+        String countDay = cacheService.findByKey(key3);
+
+        if (countMinute != null && !countMinute.equals("null")) {   //fastjson太傻逼，redis存的都是"null"字符串，而不是null
+            int countMinute2 = Integer.parseInt(countMinute);
+            if (countMinute2 < 3) {
+                cacheService.setLimitTime(key1, String.valueOf(countMinute2 + 1), (int) System.currentTimeMillis() / 1000 + 5*60);
+                return message;
+            } else {
+                message.setErrorCode(STRATEGY_ERROR_LIMIT);
+                return message;
+            }
+        } else {
+            cacheService.setLimitTime(key1, String.valueOf(1),  60);
+            return message;
         }
 
-        System.out.println(list);
 
-        for (int i = 0; i < list.size(); i++) {
-            String key=CACHE_PREFIX_DIRTYWORDS+list.get(i);
-            System.out.println(key);
-            System.out.println("脏词查询为"+cacheService.findByKey(key));
-               if(cacheService.findByKey(key)!=null && !cacheService.findByKey(key).equals("null")) {
-                   message.setErrorCode(STRATEGY_ERROR_DIRTYWORDS);
-                   log.error("说脏话了");
-                   return message;
-               }
-            }
-        log.error("通过脏词过滤器");
-        return message;
+
     }
 }

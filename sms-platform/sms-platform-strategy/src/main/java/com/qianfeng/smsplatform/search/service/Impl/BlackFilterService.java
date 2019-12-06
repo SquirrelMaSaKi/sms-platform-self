@@ -58,11 +58,12 @@ public class BlackFilterService implements FilterService {
         String key = CACHE_PREFIX_BLACK + message.getDestMobile();
         String black = cacheService.findByKey(key);
 
-        if (black != null) {
+        if (black != null && ! black.equals("null")) {
             log.error("您是大老黑");
             message.setErrorCode(STRATEGY_ERROR_BLACK);
             return message;
         }
+        log.error("通过黑名单过滤器");
         return message;
     }
 }

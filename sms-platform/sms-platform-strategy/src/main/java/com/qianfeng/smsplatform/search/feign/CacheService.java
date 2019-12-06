@@ -49,4 +49,6 @@ public interface CacheService {
     public String findByKey(@PathVariable("key") String key);
     @PostMapping("/cache/string/{key}/{value}")
     public void setFee(@PathVariable("key") String key,@PathVariable("value") String fee);
+    @RequestMapping("/cache/string/{key}/{value}/{expireTime}")
+    public void setLimitTime(@PathVariable("key") String key,@PathVariable("value")String value,@PathVariable("expireTime")int expireTime);
 }

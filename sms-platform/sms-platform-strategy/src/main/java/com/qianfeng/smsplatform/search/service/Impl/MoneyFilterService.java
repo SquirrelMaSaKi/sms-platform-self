@@ -61,6 +61,7 @@ public class MoneyFilterService implements FilterService {
         long l = Long.parseLong(fee);
         if(l-50>=0){
             cacheService.setFee(key,String.valueOf(l-50));
+            log.error("余额过滤器：余额充足");
             return message;
         }else{
             message.setErrorCode(STRATEGY_ERROR_FEE);
