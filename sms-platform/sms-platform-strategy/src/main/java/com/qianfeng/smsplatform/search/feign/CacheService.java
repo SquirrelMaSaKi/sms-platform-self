@@ -47,8 +47,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 public interface CacheService {
     @RequestMapping("/cache/string/{key}")
     public String findByKey(@PathVariable("key") String key);
+
+    @RequestMapping("/cache/string/getobject/{key}")
+    public Object findByKey2(@PathVariable("key") String key);
+
     @PostMapping("/cache/string/{key}/{value}")
     public void setFee(@PathVariable("key") String key,@PathVariable("value") String fee);
-    @RequestMapping("/cache/string/{key}/{value}/{expireTime}")
-    public void setLimitTime(@PathVariable("key") String key,@PathVariable("value")String value,@PathVariable("expireTime")int expireTime);
+    @RequestMapping("/cache/string/expire/last/{key}/{value}/{expireTime}")
+    public void setLimitTime(@PathVariable("key") String key,@PathVariable("value")long value,@PathVariable("expireTime")int expireTime);
+    @RequestMapping("/cache/string/incr/{key}/{delta}")
+    public void addOrsub(@PathVariable("key") String key,@PathVariable("delta")long value);
 }

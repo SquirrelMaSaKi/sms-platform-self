@@ -6,6 +6,8 @@ import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
+import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.context.annotation.Bean;
 
 import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_SMS_GATEWAY;
@@ -73,5 +75,7 @@ public class RabbitMqConfig {
         cachingConnectionFactory.setVirtualHost("/Five");
         return cachingConnectionFactory;
     }
+
+
 
 }
