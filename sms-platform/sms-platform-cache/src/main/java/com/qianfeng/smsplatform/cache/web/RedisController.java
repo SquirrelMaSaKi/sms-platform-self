@@ -52,7 +52,7 @@ public class RedisController {
         return cacheService.get(key);
     }
 
-    @RequestMapping("/string/{key}/{value}/{expireTime}")
+    @RequestMapping("/string/expire/last/{key}/{value}/{expireTime}")
     public Boolean set(@PathVariable String key, @PathVariable Object value,@PathVariable int expireTime){
         return cacheService.set(key, value, expireTime);
     }

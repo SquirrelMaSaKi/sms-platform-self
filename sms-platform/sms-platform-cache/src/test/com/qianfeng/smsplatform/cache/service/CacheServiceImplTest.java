@@ -106,7 +106,12 @@ public class CacheServiceImplTest {
 
     @Test
     public void get(){
-        System.out.println(cacheService.get("9278"));
-        System.err.println();
+        String aaaa = cacheService.get("aaaa");
+        System.err.println(aaaa);
+    }
+
+    @Test
+    public void set(){
+        cacheService.set("aaaa", "aaa", 5);
     }
 }
