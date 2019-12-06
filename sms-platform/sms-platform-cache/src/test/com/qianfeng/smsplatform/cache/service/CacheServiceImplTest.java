@@ -94,8 +94,8 @@ public class CacheServiceImplTest {
 
 
     @Test
-    public void test2(){
-        cacheService.set("aaaa",100000);
+    public void testSet(){
+        cacheService.set("aaaa",12345);
     }
 
     @Test

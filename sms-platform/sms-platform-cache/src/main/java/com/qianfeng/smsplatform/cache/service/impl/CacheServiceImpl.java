@@ -4,8 +4,6 @@ import com.qianfeng.smsplatform.cache.service.CacheService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.redis.serializer.RedisSerializer;
-import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -23,17 +21,8 @@ import java.util.concurrent.TimeUnit;
 @Service
 public class CacheServiceImpl implements CacheService {
 
+    @Autowired
     private RedisTemplate redisTemplate;
-
-    @Autowired(required = false)
-    public void setRedisTemplate(RedisTemplate redisTemplate) {
-        RedisSerializer stringSerializer = new StringRedisSerializer();
-        redisTemplate.setKeySerializer(stringSerializer);
-        redisTemplate.setValueSerializer(stringSerializer);
-        redisTemplate.setHashKeySerializer(stringSerializer);
-        redisTemplate.setHashValueSerializer(stringSerializer);
-        this.redisTemplate = redisTemplate;
-    }
 
     @Override
     public Boolean set(String key, Object value, int expireTime) {
