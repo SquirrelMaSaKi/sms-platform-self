@@ -32,18 +32,17 @@ public class SimpleJobConfig {
     @Bean(initMethod = "init")
     public JobScheduler feeSimpleJobScheduler(final SimpleJob feeSimpleJob,
                                               @Value("${monitorFeeJob.cron}") final String cron,
-                                              @Value("${monitorFeeJob.shardingTotalCount}") final int shardingTotalCount,
-                                              @Value("${monitorFeeJob.shardingItemParameters}") final String shardingItemParameters){
-        return new SpringJobScheduler(feeSimpleJob, regCenter, getLiteJobConfiguration(feeSimpleJob.getClass(), cron, shardingTotalCount, shardingItemParameters));
+                                              @Value("${monitorFeeJob.shardingTotalCount}") final int shardingTotalCount){
+        return new SpringJobScheduler(feeSimpleJob, regCenter, getLiteJobConfiguration(feeSimpleJob.getClass(), cron, shardingTotalCount));
     }
 
     /**
      * 作业配置
      */
     private LiteJobConfiguration getLiteJobConfiguration(final Class<? extends SimpleJob> jobClass, final String cron,
-                                                         final int shardingTotalCount, final String shardingItemParameters) {
+                                                         final int shardingTotalCount) {
         return LiteJobConfiguration.newBuilder(new SimpleJobConfiguration(JobCoreConfiguration.newBuilder(
-                jobClass.getName(), cron, shardingTotalCount).shardingItemParameters(shardingItemParameters).build(),
+                jobClass.getName(), cron, shardingTotalCount).build(),
                 jobClass.getCanonicalName())).overwrite(true).build();
     }
 }

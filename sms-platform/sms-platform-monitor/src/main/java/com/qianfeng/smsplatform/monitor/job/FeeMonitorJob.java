@@ -22,13 +22,15 @@ public class FeeMonitorJob implements SimpleJob {
     @Override
     public void execute(ShardingContext shardingContext) {
         Set<String> fees = cacheFeign.keys(CacheConstants.CACHE_PREFIX_CUSTOMER_FEE + "*");
-        for (String fee : fees) {
-            System.err.println(fee);
+        if (fees != null && fees.size() > 0) {
+            for (String fee : fees) {
+                System.err.println(fee);
 //            long fee_client = Long.valueOf(fee);
 //            if (fee_client < fee_alert) {
 //                //费用低于100元报警
 //                System.err.println("用户费用低于100元");
 //            }
+            }
         }
     }
 }
