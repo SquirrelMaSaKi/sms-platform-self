@@ -9,7 +9,6 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.Map;
 
 /**
@@ -128,45 +127,19 @@ public class SearchUtil {
         //比如 开始和结束时间对应的是range查询,appkey是term查询,甚至可能还有请求正文的内容查询应该match
         // 因为用户可能一次性输入多个条件,那按照正常来说,他应该是期望结果满足所有条件,所以还应该有bool查询
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
-        Object appKey = map.get("appKey");//如果这个appkey不等于空代表有这个查询条件
-        Object apiName = map.get("apiName");//
-        Object startTime = map.get("startTime");//
-        Object endTime = map.get("endTime");//
-        Object requestConent = map.get("requestContent");//
-        TermQueryBuilder appkeyTerm = null;
-        TermQueryBuilder apiNameTerm = null;
-        RangeQueryBuilder receiveTimeQuery = null;
-        MatchQueryBuilder contentQuery = null;
+        //如果这个appkey不等于空代表有这个查询条件
+        Object cityId = map.get("cityId");
+        Object clientID = map.get("clientID");
+        TermQueryBuilder cityIdTerm = null;
+        TermQueryBuilder clientIDTerm = null;
 
-        if (appKey != null) {
-            appkeyTerm = new TermQueryBuilder("appKey", appKey.toString());
-            boolQueryBuilder.must(appkeyTerm);
+        if (cityId != null) {
+            cityIdTerm = new TermQueryBuilder("cityId", cityId.toString());
+            boolQueryBuilder.must(cityIdTerm);
         }
-        if (apiName != null) {
-            apiNameTerm = new TermQueryBuilder("apiName", apiName.toString());
-            boolQueryBuilder.must(apiNameTerm);
-        }
-        if (startTime != null & endTime != null) {
-            Date start = simpleDateFormat.parse(startTime.toString());
-            Date end = simpleDateFormat.parse(endTime.toString());
-            receiveTimeQuery = QueryBuilders.rangeQuery("startTime").gte(start.getTime()).lte(end.getTime());
-            boolQueryBuilder.must(receiveTimeQuery);
-        }
-        else if (startTime != null & endTime == null) {
-            Date start = simpleDateFormat.parse(startTime.toString());
-            receiveTimeQuery = QueryBuilders.rangeQuery("startTime").gte(start.getTime());
-            boolQueryBuilder.must(receiveTimeQuery);
-        }
-
-        else if (startTime == null & endTime != null) {
-            Date end = simpleDateFormat.parse(endTime.toString());
-            receiveTimeQuery = QueryBuilders.rangeQuery("startTime").lte(end.getTime());
-            boolQueryBuilder.must(receiveTimeQuery);
-        }
-
-        if (requestConent != null) {
-            contentQuery = QueryBuilders.matchQuery("requestContent", requestConent.toString());
-            boolQueryBuilder.must(contentQuery);
+        if (clientID != null) {
+            clientIDTerm = new TermQueryBuilder("clientID", clientID.toString());
+            boolQueryBuilder.must(clientIDTerm);
         }
         searchSourceBuilder.query(boolQueryBuilder);
         return searchSourceBuilder;
