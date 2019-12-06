@@ -30,12 +30,15 @@ public class MessageListener {
      * 监听队列
      * @param message
      */
-    @RabbitListener(queues = RabbitMqConsants.TOPIC_PUSH_SMS_REPORT,concurrency ="10")
+    @RabbitListener(queues = RabbitMqConsants.TOPIC_PRE_SEND,concurrency ="10")
     public void queueListener(Standard_Submit message) throws Exception {
+        System.err.println("=====================================================");
         //        Standard_Submit standard_submit = objectMapper.readValue(message, Standard_Submit.class);
         //        json字符串转对象或者转map用,如果从队列中收到的为对象,就不用转了
         String json = objectMapper.writeValueAsString(message);
         searchApi.add(json);
+        log.error("-----------------------------------");
+        log.error("====================================================================");
         log.error(json);
     }
 
