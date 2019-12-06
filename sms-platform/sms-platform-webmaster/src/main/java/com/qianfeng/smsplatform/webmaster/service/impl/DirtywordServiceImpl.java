@@ -2,9 +2,11 @@ package com.qianfeng.smsplatform.webmaster.service.impl;
 
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import com.qianfeng.smsplatform.common.constants.CacheConstants;
 import com.qianfeng.smsplatform.webmaster.dao.TDirtywordMapper;
 import com.qianfeng.smsplatform.webmaster.dto.DataGridResult;
 import com.qianfeng.smsplatform.webmaster.dto.QueryDTO;
+import com.qianfeng.smsplatform.webmaster.feign.CacheFeign;
 import com.qianfeng.smsplatform.webmaster.pojo.TDirtyword;
 import com.qianfeng.smsplatform.webmaster.pojo.TDirtywordExample;
 import com.qianfeng.smsplatform.webmaster.service.DirtywordService;
@@ -20,21 +22,39 @@ public class DirtywordServiceImpl implements DirtywordService {
     @Autowired
     private TDirtywordMapper tDirtywordMapper;
 
+    @Autowired
+    private CacheFeign cacheFeign;
+
 
     @Override
     public int addDirtyword(TDirtyword tDirtyword) {
-        return tDirtywordMapper.insertSelective(tDirtyword);
+        //添加到数据库
+        int i = tDirtywordMapper.insertSelective(tDirtyword);
+
+        //添加到缓存
+        cacheFeign.setString(CacheConstants.CACHE_PREFIX_DIRTYWORDS+tDirtyword.getDirtyword(), "1");
+        return i;
     }
 
     @Override
     public int delDirtyword(Long id) {
         TDirtyword tDirtyword = findById(id);
+        //删除缓存
+        cacheFeign.del(CacheConstants.CACHE_PREFIX_DIRTYWORDS+tDirtyword.getDirtyword());
         return tDirtywordMapper.deleteByPrimaryKey(id);
     }
 
     @Override
     public int updateDirtyword(TDirtyword tDirtyword) {
+        //获取原始数据，删除缓存中数据
+        TDirtyword tDirtyword_origin = tDirtywordMapper.selectByPrimaryKey(tDirtyword.getId());
+        cacheFeign.del(CacheConstants.CACHE_PREFIX_DIRTYWORDS+tDirtyword_origin.getDirtyword());
+
+        //更新数据库
         int i = tDirtywordMapper.updateByPrimaryKey(tDirtyword);
+
+        //更新缓存
+        cacheFeign.setString(CacheConstants.CACHE_PREFIX_DIRTYWORDS+tDirtyword.getDirtyword(), "1");
         return i;
     }
 
@@ -57,6 +77,15 @@ public class DirtywordServiceImpl implements DirtywordService {
             example.setOrderByClause("id");
         }
         List<TDirtyword> tDirtywords = tDirtywordMapper.selectByExample(example);
+
+        //同步到缓存
+        for (TDirtyword tDirtyword : tDirtywords) {
+            String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_DIRTYWORDS + tDirtyword.getDirtyword());
+            if (string==null || string.trim().length()==0 || string.equals("null")) {
+                cacheFeign.setString(CacheConstants.CACHE_PREFIX_DIRTYWORDS+tDirtyword.getDirtyword(), "1");
+            }
+        }
+
         PageInfo<TDirtyword> info = new PageInfo<>(tDirtywords);
         long total = info.getTotal();
         DataGridResult result = new DataGridResult(total,tDirtywords);

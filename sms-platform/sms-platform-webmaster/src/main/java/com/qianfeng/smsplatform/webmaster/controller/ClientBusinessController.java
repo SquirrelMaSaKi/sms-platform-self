@@ -16,7 +16,6 @@ import java.util.List;
 
 @Controller
 public class ClientBusinessController {
-
     @Autowired
     private ClientBusinessService clientBusinessService;
 
@@ -34,7 +33,6 @@ public class ClientBusinessController {
         }
         return R.ok();
     }
-
 
     @ResponseBody
     @RequestMapping("/sys/clientbusiness/info/{id}")
@@ -56,5 +54,4 @@ public class ClientBusinessController {
         int i = clientBusinessService.updateClientBusiness(tClientBusiness);
         return i > 0 ? R.ok() : R.error("修改失败");
     }
-
 }

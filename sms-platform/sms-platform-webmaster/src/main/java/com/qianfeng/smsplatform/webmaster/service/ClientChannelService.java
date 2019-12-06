@@ -18,4 +18,6 @@ public interface ClientChannelService {
     public List<TClientChannel> findAll();
 
     public DataGridResult findByPage(QueryDTO queryDTO);
+
+    TClientChannel findByClientId(Long clientid);
 }

@@ -1,7 +1,11 @@
 package com.qianfeng.smsplatform.webmaster.pojo;
 
-import java.io.Serializable;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+@AllArgsConstructor
+@NoArgsConstructor
 public class TClientBusiness implements Serializable {
     private Long id;
 

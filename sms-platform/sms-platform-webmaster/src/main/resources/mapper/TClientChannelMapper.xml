@@ -155,6 +155,12 @@
             <include refid="Example_Where_Clause"/>
         </if>
     </select>
+    <select id="selectByClientId" resultType="com.qianfeng.smsplatform.webmaster.pojo.TClientChannel">
+        select
+        <include refid="Base_Column_List"/>
+        from t_client_channel
+        where clientId = #{clientid,jdbcType=BIGINT}
+    </select>
     <update id="updateByExampleSelective" parameterType="map">
         update t_client_channel
         <set>

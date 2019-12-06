@@ -52,7 +52,7 @@ public class RedisController {
         return cacheService.get(key);
     }
 
-    @RequestMapping("/string/{key}/{value}/{expireTime}")
+    @RequestMapping("/string/expire/last/{key}/{value}/{expireTime}")
     public Boolean set(@PathVariable String key, @PathVariable Object value,@PathVariable int expireTime){
         return cacheService.set(key, value, expireTime);
     }
@@ -63,27 +63,27 @@ public class RedisController {
     }
 
     @RequestMapping("/string/expire/{key}/{seconds}")
-    public boolean expire(String key, long seconds){
+    public boolean expire(@PathVariable String key,@PathVariable long seconds){
         return cacheService.expire(key,seconds);
     }
 
     @RequestMapping("/string/getexpire/{key}")
-    public long getExpire(String key){
+    public long getExpire(@PathVariable String key){
         return cacheService.getExpire(key);
     }
 
     @RequestMapping("/string/incr/{key}/{delta}")
-    public long incr(String key, long delta){
+    public long incr(@PathVariable String key,@PathVariable long delta){
         return cacheService.incr(key,delta);
     }
 
-    @RequestMapping("/string/decr/{key}/delta")
-    public long decr(String key, long delta){
+    @RequestMapping("/string/decr/{key}/{delta}")
+    public long decr(@PathVariable String key, @PathVariable long delta){
         return cacheService.decr(key, delta);
     }
 
     @RequestMapping("/string/{pattern}")
-    public Set<String> keys(String pattern){
+    public Set<String> keys(@PathVariable String pattern){
         return cacheService.keys(pattern);
     }
 

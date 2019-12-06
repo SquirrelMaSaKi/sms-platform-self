@@ -45,6 +45,13 @@ public class ClientChannelController {
     @ResponseBody
     @RequestMapping("/sys/clientchannel/save")
     public R addClientChannel(@RequestBody TClientChannel tClientChannel) {
+        //这里需要判断，因为路由更改的时候，选择的客户是ClientID，一旦重复，则redis中会出现问题
+        //我们要保证这个用户必须注册了这个平台，这个判断主要针对的是管理员，这个客户必须接入了客户管理才可以
+        //进行重复排除处理
+        TClientChannel tClientChannel_origin = clientChannelService.findByClientId(tClientChannel.getClientid());
+        if (tClientChannel_origin != null) {
+            return R.error("添加失败，不要重复");
+        }
         int i = clientChannelService.addClientChannel(tClientChannel);
         return i > 0 ? R.ok() : R.error("添加失败");
     }
@@ -52,8 +59,12 @@ public class ClientChannelController {
     @ResponseBody
     @RequestMapping("/sys/clientchannel/update")
     public R updateClientChannel(@RequestBody TClientChannel tClientChannel) {
-        int i = clientChannelService.updateClientChannel(tClientChannel);
-        return i > 0 ? R.ok() : R.error("修改失败");
+        //原始数据
+        TClientChannel tClientChannel_origin = clientChannelService.findByClientId(tClientChannel.getId());
+        if (tClientChannel_origin.getClientid() == tClientChannel.getClientid()) {
+            int i = clientChannelService.updateClientChannel(tClientChannel);
+            return i > 0 ? R.ok() : R.error("修改失败");
+        }
+        return R.error("修改失败，不要重复");
     }
-
 }

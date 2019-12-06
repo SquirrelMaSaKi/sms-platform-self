@@ -35,4 +35,6 @@ public interface CacheService {
     Map<Object, Object> hmget(String key);
 
     boolean hmset(String key, Map<String, Object> map);
+
+//    void hset(String key, Map<String, String> map);
 }
