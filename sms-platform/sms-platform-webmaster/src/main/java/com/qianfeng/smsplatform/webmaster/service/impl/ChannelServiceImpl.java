@@ -7,6 +7,7 @@ import com.qianfeng.smsplatform.webmaster.dto.DataGridResult;
 import com.qianfeng.smsplatform.webmaster.dto.QueryDTO;
 import com.qianfeng.smsplatform.webmaster.pojo.TChannel;
 import com.qianfeng.smsplatform.webmaster.pojo.TChannelExample;
+import com.qianfeng.smsplatform.webmaster.pojo.TClientChannel;
 import com.qianfeng.smsplatform.webmaster.service.ChannelService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

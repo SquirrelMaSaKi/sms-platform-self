@@ -2,6 +2,7 @@ package com.qianfeng.smsplatform.monitor.job;
 
 import com.dangdang.ddframe.job.api.ShardingContext;
 import com.dangdang.ddframe.job.api.simple.SimpleJob;
+import com.qianfeng.smsplatform.common.constants.RabbitMqConsants;
 import com.qianfeng.smsplatform.monitor.feign.ChannelFeign;
 import com.qianfeng.smsplatform.monitor.util.RabbitChannelUtil;
 import com.rabbitmq.client.Channel;
@@ -31,8 +32,14 @@ public class SizeMonitorJob implements SimpleJob {
             Connection connection = RabbitChannelUtil.getConnection();
             Channel channel = connection.createChannel();
             List<Long> channelIds = channelFeign.getChannelIds();
-            System.err.println(channelIds.toString() + "-----" + size);
-            //System.err.println(channel.messageCount(RabbitMqConsants.TOPIC_SMS_GATEWAY));
+            if (channelIds != null && channelIds.size()>0) {
+                for (Long channelId : channelIds) {
+                    long counts = channel.messageCount(RabbitMqConsants.TOPIC_SMS_GATEWAY + channelId);
+                    if (counts > size) {
+                        System.err.println("队列"+RabbitMqConsants.TOPIC_SMS_GATEWAY + channelId+"数量超额了");
+                    }
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

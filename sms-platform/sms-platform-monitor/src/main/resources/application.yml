@@ -21,6 +21,7 @@ monitorFeeJob:
 alert:
   gatewayQueue:
     size: 10000
+    #size: 0
   #  少于100元报警，这里以厘为单位
   fee: 100000
 
