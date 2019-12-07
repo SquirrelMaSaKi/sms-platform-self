@@ -4,6 +4,7 @@ import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.feign.CacheService;
 import com.qianfeng.smsplatform.search.service.FilterService;
 import com.qianfeng.smsplatform.search.util.MD5Util;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -46,6 +47,7 @@ import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATE
 *描述：
 */
 @Service("LimitFilter")
+@Slf4j
 public class LimitFilterService implements FilterService {
     @Autowired
     private CacheService cacheService;
@@ -60,9 +62,6 @@ public class LimitFilterService implements FilterService {
         String keyHour = CACHE_PREFIX_SMS_LIMIT_HOUR + MD5Util.md5(messageContent + clientID + destMobile);
         String keyDay = CACHE_PREFIX_SMS_LIMIT_DAY + MD5Util.md5(messageContent + clientID + destMobile);
 
-//        Long resultMinute = (Long) cacheService.findByKey2(keyMinute);
-//        Long resultHour = (Long) cacheService.findByKey2(keyHour);
-//        Long resultDay = (Long) cacheService.findByKey2(keyDay);
 
         Check(10, keyDay, message, 1 * 24 * 60 * 60);
         Check(5, keyHour, message, 1 * 60 * 60);
@@ -80,6 +79,7 @@ public class LimitFilterService implements FilterService {
             if (result1 < count) {
                 cacheService.addOrsub(key, 1);
             } else {
+                log.info("超过上限次数");
                 message.setErrorCode(STRATEGY_ERROR_LIMIT);
             }
         } else {

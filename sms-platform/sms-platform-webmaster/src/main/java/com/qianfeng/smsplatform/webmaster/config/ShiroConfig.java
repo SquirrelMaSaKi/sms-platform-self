@@ -66,6 +66,9 @@ public class ShiroConfig {
         map.put("/captcha.jpg", "anon");//验证码放行
         map.put("/public/**", "anon");
         map.put("/json/**", "anon");
+        map.put("/sys/channel/ids", "anon"); //放行这个路径保证内部可以用feign调用到
+        map.put("/sys/report", "anon"); //放行这个路径保证内部可以用feign调用到
+        map.put("/sys/delete", "anon"); //放行这个路径保证内部可以用feign调用到
         map.put("/**", "authc");
         shiroFilterFactoryBean.setFilterChainDefinitionMap(map);
         return shiroFilterFactoryBean;

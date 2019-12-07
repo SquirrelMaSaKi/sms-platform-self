@@ -5,10 +5,10 @@
 
 
 # rabbitMQ配置信息
-#spring:
-#  rabbitmq:
-#    host: rabbitmq.qfjava.cn
-#    port: 8800
-#    username: Five
-#    password: 123
-#    virtual-host: /Five
+spring:
+  rabbitmq:
+    host: rabbitmq.qfjava.cn
+    port: 8800
+    username: Five
+    password: 123
+    virtual-host: /Five

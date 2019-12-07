@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.Map;
 
+import static com.qianfeng.smsplatform.common.constants.CacheConstants.CACHE_PREFIX_CLIENT;
+
 /**
  * ---  2019/12/3 --- 11:57
  * --天神佑我：写代码，无BUG
@@ -17,8 +19,10 @@ import java.util.Map;
 public class CheckServiceImpl implements CheckService {
     @Autowired
     private CacheServcie cacheServcie;
+
     @Override
-    public String check( String remoteAddr,String clientID, String srcID, String mobile, String content, String pwd) {
+    public String check(String remoteAddr, String clientID, String srcID, String mobile, String content, String pwd) {
+        clientID = CACHE_PREFIX_CLIENT + clientID;
         Map<Object, Object> map = cacheServcie.hGet(clientID);
 
         //检查是否有ClientID
@@ -62,14 +66,14 @@ public class CheckServiceImpl implements CheckService {
         if (MyStringUtils.isEmpty(pwd)) {
             return InterfaceExceptionDict.RETURN_STATUS_PWD_ERROR;
         } else {
-            String password = (String)map.get("pwd");
+            String password = (String) map.get("pwd");
             if (!password.equals(pwd)) {
                 return InterfaceExceptionDict.RETURN_STATUS_PWD_ERROR;
             }
         }
 
         //匹配IP
-        String ip = (String)map.get("ipAddress");
+        String ip = (String) map.get("ipaddress");
         if (ip == null) {
             System.err.println("Ipaddress.............................》》》》》》》》》》》》》》");
             return InterfaceExceptionDict.RETURN_STATUS_IP_ERROR;

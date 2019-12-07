@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: '@profileActive@'
+  application:
+    name: monitor
 
 monitorQueueSizeJob:
   #cron表达式，用于控制作业触发时间
@@ -15,10 +17,16 @@ monitorFeeJob:
   shardingTotalCount: 1
   shardingItemParameters: null
 
+monitorReportJob:
+  cron: 0/10 * * * * ?
+  shardingTotalCount: 1
+  shardingItemParameters: null
+
 #报警参数
 alert:
   gatewayQueue:
     size: 10000
+    #size: 0
   #  少于100元报警，这里以厘为单位
   fee: 100000
 
