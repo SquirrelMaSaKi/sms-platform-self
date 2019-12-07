@@ -2,25 +2,16 @@ package com.qianfeng.smsplatform.search.mq;
 
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.service.FilterService;
-import com.qianfeng.smsplatform.search.service.Impl.BlackFilterService;
-import com.qianfeng.smsplatform.search.service.Impl.DirtyFilterService;
-import feign.RequestLine;
-import jdk.nashorn.internal.runtime.logging.Logger;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitHandler;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.PathVariable;
 
-
-import java.util.List;
 import java.util.Map;
 
 import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.*;
-import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATEGY_ERROR_DIRTYWORDS;
 
 /*
 //                            _ooOoo_

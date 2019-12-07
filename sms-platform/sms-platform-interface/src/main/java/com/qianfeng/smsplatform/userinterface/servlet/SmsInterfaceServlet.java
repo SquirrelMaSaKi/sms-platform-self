@@ -4,6 +4,7 @@ import com.qianfeng.smsplatform.common.constants.InterfaceExceptionDict;
 import com.qianfeng.smsplatform.common.constants.RabbitMqConsants;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.userinterface.servcie.CheckService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.core.AmqpTemplate;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -19,6 +20,7 @@ import java.net.InetAddress;
  * ---  2019/12/3 --- 10:06
  * --天神佑我：写代码，无BUG
  */
+@Slf4j
 @WebServlet(name = "smsInterfaceServlet",urlPatterns = "/smsInterface")
 public class SmsInterfaceServlet extends HttpServlet {
     @Autowired
@@ -27,15 +29,16 @@ public class SmsInterfaceServlet extends HttpServlet {
     private AmqpTemplate amqpTemplate;
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
+        request.setCharacterEncoding("utf-8");
         String clientID = request.getParameter("clientID");
+
         String srcID = request.getParameter("srcID");
         String mobile = request.getParameter("mobile");
         String content = request.getParameter("content");
         String pwd = request.getParameter("pwd");
         String remoteAddr = getRemoteAddr(request);
         System.err.println(remoteAddr);
-
+        log.error(remoteAddr);
         String code = checkService.check(remoteAddr,clientID, srcID, mobile, content, pwd);
         if (code.equals(InterfaceExceptionDict.RETURN_STATUS_SUCCESS)) {
             String[] split = mobile.split(",");

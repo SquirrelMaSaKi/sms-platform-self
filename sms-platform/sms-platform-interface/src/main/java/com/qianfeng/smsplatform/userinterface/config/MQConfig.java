@@ -18,6 +18,8 @@ public class MQConfig {
     @Bean
     public Queue queue1() {
         return new Queue(RabbitMqConsants.TOPIC_PUSH_SMS_REPORT);
+    }@Bean
+    public Queue queue2() {
+        return new Queue(RabbitMqConsants.TOPIC_PUSH_ERROR);
     }
-
 }

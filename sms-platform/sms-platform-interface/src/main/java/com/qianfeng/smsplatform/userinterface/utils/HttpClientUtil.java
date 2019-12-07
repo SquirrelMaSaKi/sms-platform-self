@@ -85,8 +85,14 @@ public class HttpClientUtil {
 			// 执行http请求
 			response = httpClient.execute(httpPost);
 			resultString = EntityUtils.toString(response.getEntity(), "utf-8");
+			int statusCode = response.getStatusLine().getStatusCode();
+			if (statusCode != 200) {
+				System.err.println("resultString》》》》》》》"+resultString);
+				return "error";
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
+
 		} finally {
 			try {
 				response.close();
