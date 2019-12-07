@@ -60,9 +60,6 @@ public class LimitFilterService implements FilterService {
         String keyHour = CACHE_PREFIX_SMS_LIMIT_HOUR + MD5Util.md5(messageContent + clientID + destMobile);
         String keyDay = CACHE_PREFIX_SMS_LIMIT_DAY + MD5Util.md5(messageContent + clientID + destMobile);
 
-//        Long resultMinute = (Long) cacheService.findByKey2(keyMinute);
-//        Long resultHour = (Long) cacheService.findByKey2(keyHour);
-//        Long resultDay = (Long) cacheService.findByKey2(keyDay);
 
         Check(10, keyDay, message, 1 * 24 * 60 * 60);
         Check(5, keyHour, message, 1 * 60 * 60);
