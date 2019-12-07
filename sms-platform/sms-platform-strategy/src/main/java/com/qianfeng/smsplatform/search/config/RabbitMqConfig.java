@@ -2,13 +2,21 @@ package com.qianfeng.smsplatform.search.config;
 
 import com.qianfeng.smsplatform.common.model.Standard_Report;
 import com.rabbitmq.client.AMQP;
+import com.rabbitmq.client.Connection;
+import com.rabbitmq.client.ConnectionFactory;
+import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.connection.AbstractConnectionFactory;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
-import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
 import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.io.IOException;
+
+import java.util.concurrent.TimeoutException;
 
 import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_SMS_GATEWAY;
 import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_SMS_SEND_LOG;
@@ -56,35 +64,15 @@ public class RabbitMqConfig {
     }
 
     @Bean
-    public Queue queue(){
-        return new Queue(TOPIC_SMS_SEND_LOG,true);
+    public static ConnectionFactory connectionFactory(){
+        ConnectionFactory connectionFactory=new ConnectionFactory();
+        connectionFactory.setHost("rabbitmq.qfjava.cn");
+        connectionFactory.setPort(8800);
+        connectionFactory.setUsername("Five");
+        connectionFactory.setPassword("123");
+        connectionFactory.setVirtualHost("/Five");
+        return connectionFactory;
     }
-
-    @Bean
-    public Queue queue1(){
-        return new Queue(TOPIC_SMS_GATEWAY+1,true);
-    }
-    @Bean
-    public Queue queue2(){
-        return new Queue(TOPIC_SMS_GATEWAY+2,true);
-    }
-    @Bean
-    public Queue queue3(){
-        return new Queue(TOPIC_SMS_GATEWAY+3,true);
-    }
-
-
-    @Bean
-    public ConnectionFactory connectionFactory(){
-        CachingConnectionFactory cachingConnectionFactory=new CachingConnectionFactory();
-        cachingConnectionFactory.setHost("rabbitmq.qfjava.cn");
-        cachingConnectionFactory.setPort(8800);
-        cachingConnectionFactory.setUsername("Five");
-        cachingConnectionFactory.setPassword("123");
-        cachingConnectionFactory.setVirtualHost("/Five");
-        return cachingConnectionFactory;
-    }
-
 
 
 }
