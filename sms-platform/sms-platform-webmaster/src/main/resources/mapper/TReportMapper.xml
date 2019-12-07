@@ -7,4 +7,10 @@
     <insert id="insert">
         insert into t_report(mobile,state,errorCode,srcID,clientID,msgId,sendCount) values (#{mobile},#{state},#{errorCode},#{srcID},#{clientID},#{msgId},#{sendCount})
     </insert>
+    <delete id="deleteAll">
+        delete from t_report
+    </delete>
+    <select id="findAll" resultType="com.qianfeng.smsplatform.common.model.Standard_Report">
+        select * from t_report
+    </select>
 </mapper>

@@ -1,5 +1,6 @@
 package com.qianfeng.smsplatform.webmaster.mq;
 
+import com.qianfeng.smsplatform.common.constants.RabbitMqConsants;
 import com.qianfeng.smsplatform.common.model.Standard_Report;
 import com.qianfeng.smsplatform.webmaster.service.TReportService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -12,8 +13,8 @@ public class SendFailListener {
     private TReportService tReportService;
 
     //监听发送失败队列
-    @RabbitListener()
+    @RabbitListener(queues = RabbitMqConsants.TOPIC_PUSH_ERROR, concurrency = "10")
     public void getSendFailMessage(Standard_Report report) {
-
+        tReportService.insert(report);
     }
 }

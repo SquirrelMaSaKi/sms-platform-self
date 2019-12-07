@@ -17,6 +17,11 @@ monitorFeeJob:
   shardingTotalCount: 1
   shardingItemParameters: null
 
+monitorReportJob:
+  cron: 0/10 * * * * ?
+  shardingTotalCount: 1
+  shardingItemParameters: null
+
 #报警参数
 alert:
   gatewayQueue:

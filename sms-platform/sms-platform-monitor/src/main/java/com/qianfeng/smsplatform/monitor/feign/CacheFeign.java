@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Map;
 import java.util.Set;
 
 @FeignClient(value = "CACHE-SERVICE")
@@ -14,4 +15,7 @@ public interface CacheFeign {
 
     @RequestMapping(value = "/cache/keys")
     Set<String> keys(@RequestParam("pattern") String pattern);
+
+    @RequestMapping("/cache/hget/{key}")
+    Map<Object, Object> hget(@PathVariable("key") String key);
 }
