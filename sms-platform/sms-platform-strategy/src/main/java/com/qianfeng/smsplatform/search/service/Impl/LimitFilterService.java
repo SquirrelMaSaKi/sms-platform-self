@@ -3,14 +3,13 @@ package com.qianfeng.smsplatform.search.service.Impl;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.feign.CacheService;
 import com.qianfeng.smsplatform.search.service.FilterService;
+import com.qianfeng.smsplatform.search.util.MD5Util;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
-import static com.qianfeng.smsplatform.common.constants.CacheConstants.CACHE_PREFIX_CUSTOMER_FEE;
-import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATEGY_ERROR_FEE;
+import static com.qianfeng.smsplatform.common.constants.CacheConstants.*;
+import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATEGY_ERROR_LIMIT;
 
 /*
 //                            _ooOoo_  
@@ -47,31 +46,47 @@ import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATE
 *裴少泊的修仙之路
 *描述：
 */
+@Service("LimitFilter")
 @Slf4j
-@Service("MoneyFilter")
-public class MoneyFilterService implements FilterService {
+public class LimitFilterService implements FilterService {
     @Autowired
     private CacheService cacheService;
 
+
     @Override
     public Standard_Submit filtrate(Standard_Submit message) {
-        String key = CACHE_PREFIX_CUSTOMER_FEE + message.getClientID();
-        String fee = cacheService.findByKey(key);
-        log.error("余额" + fee);
-        long l=0;
-        if (fee!=null && !fee.equals("null")) {
-            l= Long.parseLong(fee);
+        String messageContent = message.getMessageContent();
+        int clientID = message.getClientID();
+        String destMobile = message.getDestMobile();
+        String keyMinute = CACHE_PREFIX_SMS_LIMIT_FIVE_MINUTE + MD5Util.md5(messageContent + clientID + destMobile);
+        String keyHour = CACHE_PREFIX_SMS_LIMIT_HOUR + MD5Util.md5(messageContent + clientID + destMobile);
+        String keyDay = CACHE_PREFIX_SMS_LIMIT_DAY + MD5Util.md5(messageContent + clientID + destMobile);
 
-            if (l - 50 >= 0) {
-                cacheService.setFee(key, String.valueOf(l - 50));
-                log.error("余额过滤器：余额充足");
-                return message;
-            } else {
-                message.setErrorCode(STRATEGY_ERROR_FEE);
-                return message;
-            }
-        }
-        message.setErrorCode(STRATEGY_ERROR_FEE);
+
+        Check(10, keyDay, message, 1 * 24 * 60 * 60);
+        Check(5, keyHour, message, 1 * 60 * 60);
+        Check(3, keyMinute, message, 5 * 60);
+
         return message;
     }
+
+
+    public void Check(int count, String key, Standard_Submit message, int expiretime) {
+        String result=String.valueOf(cacheService.findByKey2(key));
+
+        if (result != null && !result.equals("null")) {
+            long result1 = Long.parseLong(result);
+            if (result1 < count) {
+                cacheService.addOrsub(key, 1);
+            } else {
+                log.info("超过上限次数");
+                message.setErrorCode(STRATEGY_ERROR_LIMIT);
+            }
+        } else {
+            cacheService.setLimitTime(key, 1, expiretime);
+        }
+
+    }
+
 }
+

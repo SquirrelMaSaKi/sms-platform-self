@@ -5,6 +5,7 @@ import com.qianfeng.smsplatform.search.feign.CacheService;
 import com.qianfeng.smsplatform.search.service.FilterService;
 import com.qianfeng.smsplatform.search.util.AnalyzerUtil;
 import com.qianfeng.smsplatform.search.util.fenciqi.IKAnalyzer4Lucene7;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.TokenStream;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,6 +52,7 @@ import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATE
 *裴少泊的修仙之路
 *描述：
 */
+@Slf4j
 @Service("DirtyFilter")
 public class DirtyFilterService implements FilterService {
 //    private String[] str={"卧槽","造反","打劫","撕票"};
@@ -76,12 +78,13 @@ public class DirtyFilterService implements FilterService {
             String key=CACHE_PREFIX_DIRTYWORDS+list.get(i);
             System.out.println(key);
             System.out.println("脏词查询为"+cacheService.findByKey(key));
-               if(cacheService.findByKey(key)!=null) {
+               if(cacheService.findByKey(key)!=null && !cacheService.findByKey(key).equals("null")) {
                    message.setErrorCode(STRATEGY_ERROR_DIRTYWORDS);
+                   log.error("说脏话了");
                    return message;
                }
             }
-
+        log.error("通过脏词过滤器");
         return message;
     }
 }

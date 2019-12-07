@@ -1,10 +1,13 @@
 package com.qianfeng.smsplatform.search.config;
 
+import com.qianfeng.smsplatform.common.model.Standard_Report;
 import com.rabbitmq.client.AMQP;
 import org.springframework.amqp.core.*;
 import org.springframework.amqp.rabbit.connection.CachingConnectionFactory;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.support.ResponseEntityDecoder;
+import org.springframework.cloud.openfeign.support.SpringDecoder;
 import org.springframework.context.annotation.Bean;
 
 import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_SMS_GATEWAY;
@@ -24,7 +27,7 @@ import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_S
 //                     | \_| ''\---/'' | |
 //                      \ .-\__ `-` ___/-. /
 //                   ___`. .' /--.--\ `. . __
-//                ."" '< `.___\_<|>_/___.' >'"".
+//                ."" '< `.___\_<|>_/___.' >'"".                                                                                    
 //               | | : `- \`.;`\ _ /`;.`/ - ` : | |
 //                 \ \ `-. \_ __\ /__ _/ .-` / /
 //         ======`-.____`-.___\_____/___.-`____.-'======
@@ -48,14 +51,28 @@ import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.TOPIC_S
 @SpringBootApplication
 public class RabbitMqConfig {
     @Bean
+    public Standard_Report report(){
+        return new Standard_Report();
+    }
+
+    @Bean
     public Queue queue(){
         return new Queue(TOPIC_SMS_SEND_LOG,true);
     }
 
     @Bean
     public Queue queue1(){
-        return new Queue(TOPIC_SMS_GATEWAY,true);
+        return new Queue(TOPIC_SMS_GATEWAY+1,true);
     }
+    @Bean
+    public Queue queue2(){
+        return new Queue(TOPIC_SMS_GATEWAY+2,true);
+    }
+    @Bean
+    public Queue queue3(){
+        return new Queue(TOPIC_SMS_GATEWAY+3,true);
+    }
+
 
     @Bean
     public ConnectionFactory connectionFactory(){
@@ -67,5 +84,7 @@ public class RabbitMqConfig {
         cachingConnectionFactory.setVirtualHost("/Five");
         return cachingConnectionFactory;
     }
+
+
 
 }

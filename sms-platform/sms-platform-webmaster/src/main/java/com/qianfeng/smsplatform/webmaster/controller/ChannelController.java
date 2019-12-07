@@ -7,12 +7,8 @@ import com.qianfeng.smsplatform.webmaster.service.ChannelService;
 import com.qianfeng.smsplatform.webmaster.util.R;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -64,4 +60,9 @@ public class ChannelController {
         return i > 0 ? R.ok() : R.error("修改失败");
     }
 
+    @ResponseBody
+    @RequestMapping("/sys/channel/ids")
+    public List<Long> getChannelIds() {
+        return channelService.TChannel_allIds();
+    }
 }

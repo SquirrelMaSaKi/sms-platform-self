@@ -26,12 +26,12 @@ public class CacheServiceImpl implements CacheService {
 
     @Override
     public Boolean set(String key, Object value, int expireTime) {
-        redisTemplate.opsForValue().set(key,value);
+        redisTemplate.opsForValue().set(key,value,expireTime, TimeUnit.SECONDS);
         return true;
     }
 
     @Override
-    public Boolean set(String key, String value, int expireTime) {
+    public Boolean set(String key, long value, int expireTime) {
         redisTemplate.opsForValue().set(key,value,expireTime, TimeUnit.SECONDS);
         return true;
     }
