@@ -1,5 +1,7 @@
 package com.qianfeng.smsplatform.search.service;
 
+import com.qianfeng.smsplatform.common.model.Standard_Submit;
+
 import java.util.List;
 import java.util.Map;
 
@@ -45,4 +47,11 @@ public interface SearchApi {
      * @throws Exception
      */
     long getCount(String params) throws Exception;
+
+    /**
+     * 更新数据报告
+     * @param submit
+     * @throws Exception
+     */
+    void update(Standard_Submit submit) throws Exception;
 }

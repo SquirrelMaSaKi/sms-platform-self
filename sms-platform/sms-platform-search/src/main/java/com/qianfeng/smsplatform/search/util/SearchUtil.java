@@ -9,6 +9,7 @@ import org.elasticsearch.search.builder.SearchSourceBuilder;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map;
 
 /**
@@ -20,7 +21,7 @@ import java.util.Map;
 
 public class SearchUtil {
 
-    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy");
 
 
     public static void buildMapping(String typeName, CreateIndexRequest request) throws IOException {
@@ -128,15 +129,42 @@ public class SearchUtil {
         // 因为用户可能一次性输入多个条件,那按照正常来说,他应该是期望结果满足所有条件,所以还应该有bool查询
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
         //如果这个appkey不等于空代表有这个查询条件
-        Object cityId = map.get("cityId");
+        Object messageContent = map.get("keyword");
+        Object startTime = map.get("startTime");
+        Object endTime = map.get("endTime");
+        Object srcNumber = map.get("mobile");
         Object clientID = map.get("clientID");
-        TermQueryBuilder cityIdTerm = null;
+        MatchQueryBuilder keywordTerm = null;
+        RangeQueryBuilder receiveTimeQuery = null;
+        TermQueryBuilder srcNumberTerm = null;
         TermQueryBuilder clientIDTerm = null;
 
-        if (cityId != null) {
-            cityIdTerm = new TermQueryBuilder("cityId", cityId.toString());
-            boolQueryBuilder.must(cityIdTerm);
+        //号码查询
+        if(srcNumber != null){
+            srcNumberTerm = new TermQueryBuilder("srcNumber",srcNumber.toString());
+            boolQueryBuilder.must(srcNumberTerm);
         }
+        //关键字查询
+        if (messageContent != null) {
+            keywordTerm = QueryBuilders.matchQuery("messageContent", messageContent.toString());
+            boolQueryBuilder.must(keywordTerm);
+        }
+        //时间间隔查询
+        if (startTime != null & endTime != null) {
+            Date start = simpleDateFormat.parse(startTime.toString());
+            Date end = simpleDateFormat.parse(endTime.toString());
+            receiveTimeQuery = QueryBuilders.rangeQuery("startTime").gte(start.getTime()).lte(end.getTime());
+            boolQueryBuilder.must(receiveTimeQuery);
+        } else if (startTime != null & endTime == null) {
+            Date start = simpleDateFormat.parse(startTime.toString());
+            receiveTimeQuery = QueryBuilders.rangeQuery("startTime").gte(start.getTime());
+            boolQueryBuilder.must(receiveTimeQuery);
+        } else if (startTime == null & endTime != null) {
+            Date end = simpleDateFormat.parse(endTime.toString());
+            receiveTimeQuery = QueryBuilders.rangeQuery("startTime").lte(end.getTime());
+            boolQueryBuilder.must(receiveTimeQuery);
+        }
+        //根据clientID查询
         if (clientID != null) {
             clientIDTerm = new TermQueryBuilder("clientID", clientID.toString());
             boolQueryBuilder.must(clientIDTerm);

@@ -1,8 +1,11 @@
 package com.qianfeng.smsplatform.search.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.service.SearchApi;
 import com.qianfeng.smsplatform.search.util.SearchUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.delete.DeleteIndexRequest;
 import org.elasticsearch.action.admin.indices.get.GetIndexRequest;
@@ -11,11 +14,15 @@ import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchRequest;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.support.master.AcknowledgedResponse;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.RequestOptions;
 import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -39,6 +46,7 @@ import java.util.Map;
  * @Date 2019/12/4 15:34
  * @Description TODO
  */
+@Slf4j
 @Service
 public class SearchApiImpl implements SearchApi {
 
@@ -66,7 +74,7 @@ public class SearchApiImpl implements SearchApi {
             SearchUtil.buildMapping(typeName,createIndexRequest);
             client.indices().create(createIndexRequest,RequestOptions.DEFAULT);
         }else{
-            logger.error("创建失败，索引已存在");
+            logger.info("创建失败，索引已存在");
         }
 
     }
@@ -76,7 +84,7 @@ public class SearchApiImpl implements SearchApi {
         if(existIndex(indexName)){
             DeleteIndexRequest deleteIndexRequest = new DeleteIndexRequest(indexName);
             AcknowledgedResponse delete =  client.indices().delete(deleteIndexRequest, RequestOptions.DEFAULT);
-            logger.error("删除index的结果是：{}",objectMapper.writeValueAsString(delete));
+            logger.info("删除index的结果是：{}",objectMapper.writeValueAsString(delete));
         }else {
             logger.error("删除失败，不存在指定索引");
         }
@@ -87,7 +95,7 @@ public class SearchApiImpl implements SearchApi {
         IndexRequest indexRequest = new IndexRequest(indexName, typeName);
         indexRequest.source(json, XContentType.JSON);
         IndexResponse response = client.index(indexRequest, RequestOptions.DEFAULT);
-        logger.error("插入数据结果是:{}", objectMapper.writeValueAsString(response));
+        logger.info("插入数据结果是:{}", objectMapper.writeValueAsString(response));
     }
 
     @Override
@@ -100,8 +108,8 @@ public class SearchApiImpl implements SearchApi {
 
         //如果传递了分页参数 应该有分页,我们规定用户传递 start和end两个参数过来代表分页
         //但是如果数据太多,用户又没有传递分页,咋办,我们应该有默认长度
-        Object start = value.get("start");
-        Object end = value.get("end");
+        Object start = value.get("startTime");
+        Object end = value.get("endTime");
         if (start == null) {
             start = 1;
         } else {
@@ -123,7 +131,6 @@ public class SearchApiImpl implements SearchApi {
                 e.printStackTrace();
             }
         }
-
         builder.from((Integer.parseInt(start.toString()) - 1) * Integer.parseInt(end.toString(), Integer.parseInt(end.toString())));
         //应该要设置高亮数据,理论上高亮的标签应该是用户传递的,当然我们也有默认的
         //如果传递了请求参数才设置高亮
@@ -188,6 +195,39 @@ public class SearchApiImpl implements SearchApi {
         return response.getHits().getTotalHits();
     }
 
+    /**
+     * 更新状态报告
+     * @param submit
+     * @throws Exception
+     */
+    @Override
+    public void update(Standard_Submit submit) throws Exception {
+        existIndex(indexName);
+        String id = getId(submit.getMsgid());
+        UpdateRequest updateRequest = new UpdateRequest(indexName, typeName, id);
+        updateRequest.doc(JSON.toJSONString(submit),XContentType.JSON);
+        UpdateResponse response = client.update(updateRequest,RequestOptions.DEFAULT);
+        logger.debug("更新结果{}",response);
+    }
+
+    /**
+     * 由于插入数据时未指定id， 所以通过msgId 获取数据的id
+     * @param msg
+     * @return
+     * @throws IOException
+     */
+    public String getId(String msg) throws IOException {
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        //根据msgID 进行查询，获取命中ID
+        TermQueryBuilder termQueryBuilder = QueryBuilders.termQuery("msgid",msg);
+        SearchSourceBuilder builder = new SearchSourceBuilder();
+        builder.query(termQueryBuilder);
+        searchRequest.source(builder);
+        SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
+        SearchHits hits = response.getHits();
+        //获取命中数据的ID
+        return hits.getAt(0).getId();
+    }
 
     /**
      * 判断是否存在索引
