@@ -1,6 +1,8 @@
 spring:
   profiles:
     active: '@profileActive@'
+  application:
+    name: monitor
 
 monitorQueueSizeJob:
   #cron表达式，用于控制作业触发时间
