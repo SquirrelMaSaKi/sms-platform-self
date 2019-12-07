@@ -92,16 +92,17 @@ public class ReceiveMessage {
 //          log.error("对象"+filterServicesMap.get(split[i]));
 
             message = filterServicesMap.get(split[i]).filtrate(message);   //通过获取到的名字也就是key,去获取value(value是对应service的对象)
+            if (message.getSource()==1) {
+                report.setClientID(message.getClientID());
+                report.setErrorCode(message.getErrorCode());
+                report.setMobile(message.getDestMobile());
+                report.setClientID(message.getClientID());
+                report.setSrcID(message.getSrcSequenceId());
+                send.sendMessage2(TOPIC_PUSH_SMS_REPORT, report);
+            }
+
             if (message.getErrorCode() != null) {
                 System.out.println("写入下发日志");
-                if (message.getSource()==1) {
-                    report.setClientID(message.getClientID());
-                    report.setErrorCode(message.getErrorCode());
-                    report.setMobile(message.getDestMobile());
-                    report.setClientID(message.getClientID());
-                    report.setSrcID(message.getSrcSequenceId());
-                    send.sendMessage2(TOPIC_PUSH_SMS_REPORT, report);
-                }
                 send.sendMessage(TOPIC_SMS_SEND_LOG, message);
                 return;
             }
