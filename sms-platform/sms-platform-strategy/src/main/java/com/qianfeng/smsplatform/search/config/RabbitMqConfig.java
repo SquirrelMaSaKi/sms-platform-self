@@ -62,8 +62,17 @@ public class RabbitMqConfig {
 
     @Bean
     public Queue queue1(){
-        return new Queue(TOPIC_SMS_GATEWAY,true);
+        return new Queue(TOPIC_SMS_GATEWAY+1,true);
     }
+    @Bean
+    public Queue queue2(){
+        return new Queue(TOPIC_SMS_GATEWAY+2,true);
+    }
+    @Bean
+    public Queue queue3(){
+        return new Queue(TOPIC_SMS_GATEWAY+3,true);
+    }
+
 
     @Bean
     public ConnectionFactory connectionFactory(){

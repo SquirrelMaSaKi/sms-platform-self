@@ -1,14 +1,9 @@
 package com.qianfeng.smsplatform.search.feign;
 
-import feign.Param;
-import feign.RequestLine;
 import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.util.Map;
+import java.util.List;
 
 /*
 //                            _ooOoo_  
@@ -45,22 +40,8 @@ import java.util.Map;
 *裴少泊的修仙之路
 *描述：
 */
-@FeignClient("CACHE-SERVICE")
-public interface CacheService {
-    @RequestMapping("/cache/string/{key}")
-    public String findByKey(@PathVariable("key") String key);
-
-    @RequestMapping("/cache/string/getobject/{key}")
-    public Object findByKey2(@PathVariable("key") String key);
-    @RequestMapping("/cache/hget/{key}")
-    public Map<Object,Object> findByKey3( @PathVariable("key") String key);
-
-    @PostMapping("/cache/string/{key}/{value}")
-    public void setFee(@PathVariable("key") String key,@PathVariable("value") String fee);
-    @RequestMapping("/cache/string/expire/last/{key}/{value}/{expireTime}")
-    public void setLimitTime(@PathVariable("key") String key,@PathVariable("value")long value,@PathVariable("expireTime")int expireTime);
-    @RequestMapping("/cache/string/incr/{key}/{delta}")
-    public void addOrsub(@PathVariable("key") String key,@PathVariable("delta")long value);
-
-
+@FeignClient("SMS-PLATFORM-WEBMASTER")
+public interface WebMaster {
+    @RequestMapping("/sys/channel/ids")
+    List<Long> getChannelIds ();
 }
