@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.service.SearchApi;
+import com.qianfeng.smsplatform.search.util.SearchPojo;
 import com.qianfeng.smsplatform.search.util.SearchUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -103,41 +104,17 @@ public class SearchApiImpl implements SearchApi {
         List list = new ArrayList();
         //和查询数量一样,根据条件查询结果,但是我们可能会有分页,可能还有高亮
         //将用户传递的json转换为map
-        Map value = objectMapper.readValue(params, Map.class);
+        SearchPojo value = objectMapper.readValue(params, SearchPojo.class);
         SearchSourceBuilder builder = SearchUtil.getSearchSourceBuilder(value);
-
-        //如果传递了分页参数 应该有分页,我们规定用户传递 start和end两个参数过来代表分页
-        //但是如果数据太多,用户又没有传递分页,咋办,我们应该有默认长度
-        Object start = value.get("startTime");
-        Object end = value.get("endTime");
-        if (start == null) {
-            start = 1;
-        } else {
-            try {
-                start = Integer.parseInt(start.toString());
-            } catch (Exception e) {
-                start = 1;
-                e.printStackTrace();
-            }
-        }
-
-        if (end == null) {
-            end = 10;
-        } else {
-            try {
-                end = Integer.parseInt(end.toString());
-            } catch (Exception e) {
-                end = 10;
-                e.printStackTrace();
-            }
-        }
-        builder.from((Integer.parseInt(start.toString()) - 1) * Integer.parseInt(end.toString(), Integer.parseInt(end.toString())));
+        //设置开始位置和总行数
+        builder.from(value.getStart());
+        builder.size(value.getRows());
         //应该要设置高亮数据,理论上高亮的标签应该是用户传递的,当然我们也有默认的
         //如果传递了请求参数才设置高亮
-        if (value.get("requestContent") != null) {
+        if (value.getKeyword() != null) {
             //高亮的前缀和后缀
-            Object highlightpretag = value.get("highlightpretag");
-            Object highlightposttag = value.get("highlightposttag");
+            Object highlightpretag = value.getHighLightPreTag();
+            Object highlightposttag = value.getHighLightPostTag();
 
             if (highlightposttag == null || "".equalsIgnoreCase(highlightposttag.toString().trim())) {
                 highlightposttag = "</span>";
@@ -187,7 +164,7 @@ public class SearchApiImpl implements SearchApi {
     @Override
     public long getCount(String params) throws Exception {
         //将用户传递的json转换为map
-        Map value = objectMapper.readValue(params, Map.class);
+        SearchPojo value = objectMapper.readValue(params, SearchPojo.class);
         SearchSourceBuilder builder = SearchUtil.getSearchSourceBuilder(value);
         SearchRequest searchRequest = new SearchRequest(indexName);
         searchRequest.source(builder);

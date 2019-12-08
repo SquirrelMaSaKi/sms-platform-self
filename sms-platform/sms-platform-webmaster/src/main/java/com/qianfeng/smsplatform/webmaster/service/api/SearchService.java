@@ -14,7 +14,7 @@ public interface SearchService {
     List<Map> searchLog(@RequestParam("paras") String paras);
 
     @RequestMapping(value = "/search/searchcount", method = RequestMethod.POST)
-    Long searchLogCount(@RequestParam("paras") String paras);
+    long searchLogCount(@RequestParam("paras") String paras);
 
     @RequestMapping(value = "/search/statStatus", method = RequestMethod.POST)
     public Map<String, Long> statSendStatus(@RequestParam("paras") String paras);

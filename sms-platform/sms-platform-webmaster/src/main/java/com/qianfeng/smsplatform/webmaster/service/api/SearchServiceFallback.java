@@ -17,8 +17,8 @@ public class SearchServiceFallback implements SearchService {
     }
 
     @Override
-    public Long searchLogCount(String paras) {
-        return null;
+    public long searchLogCount(String paras) {
+        return 0;
     }
 
     @Override

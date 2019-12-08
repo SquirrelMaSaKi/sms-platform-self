@@ -38,8 +38,8 @@ public class MessageListener {
         //json字符串转对象或者转map用, 如果从队列中收到的为对象, 就不用转了
 
         //Standard_Submit standard_submit = objectMapper.readValue(message, Standard_Submit.class);
+        log.debug("接收到的消息:{}",message);
         String json = objectMapper.writeValueAsString(message);
-        log.debug(json);
         searchApi.add(json);
     }
 

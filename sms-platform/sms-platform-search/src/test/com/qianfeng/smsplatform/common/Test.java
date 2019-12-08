@@ -69,6 +69,7 @@ public class Test {
     @org.junit.Test
     public void testGet() throws Exception {
         HashMap map = new HashMap();
+        map.put("aaa","aa");
         String json = objectMapper.writeValueAsString(map);
         System.err.println("=====================================");
         System.err.println("===============es总数据数==================");
