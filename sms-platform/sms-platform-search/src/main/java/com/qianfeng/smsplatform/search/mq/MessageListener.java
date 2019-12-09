@@ -48,7 +48,7 @@ public class MessageListener {
      * @param report
      * @throws Exception
      */
-    @RabbitListener(queues = RabbitMqConsants.TOPIC_PUSH_SMS_REPORT, concurrency = "10")
+    @RabbitListener(queues = RabbitMqConsants.TOPIC_UPDATE_SMS_REPORT, concurrency = "10")
     public void reportQueueListener(Standard_Report report) throws Exception {
         Standard_Submit submit = new Standard_Submit();
         submit.setDestMobile(report.getMobile());
