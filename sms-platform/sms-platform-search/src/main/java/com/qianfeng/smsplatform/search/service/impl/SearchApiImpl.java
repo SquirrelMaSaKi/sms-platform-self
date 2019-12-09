@@ -3,6 +3,7 @@ package com.qianfeng.smsplatform.search.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
+import com.qianfeng.smsplatform.search.dto.SmsStatusDTO;
 import com.qianfeng.smsplatform.search.service.SearchApi;
 import com.qianfeng.smsplatform.search.util.SearchPojo;
 import com.qianfeng.smsplatform.search.util.SearchUtil;
@@ -22,7 +23,9 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -37,6 +40,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -107,8 +111,20 @@ public class SearchApiImpl implements SearchApi {
         SearchPojo value = objectMapper.readValue(params, SearchPojo.class);
         SearchSourceBuilder builder = SearchUtil.getSearchSourceBuilder(value);
         //设置开始位置和总行数
-        builder.from(value.getStart());
-        builder.size(value.getRows());
+        int start  = 0;
+        int rows = 0;
+        if(value.getStart() == 0){
+            start = 1;
+        }else{
+            start = value.getStart();
+        }
+        if (value.getRows() == 0){
+            rows = 10;
+        }else{
+            rows = value.getRows();
+        }
+        builder.from(start);
+        builder.size(rows);
         //应该要设置高亮数据,理论上高亮的标签应该是用户传递的,当然我们也有默认的
         //如果传递了请求参数才设置高亮
         if (value.getKeyword() != null) {
@@ -217,4 +233,64 @@ public class SearchApiImpl implements SearchApi {
         getIndexRequest.indices(indexName);
         return client.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
     }
+
+
+
+    /**
+     * 查询某一个用户在某一个时间段：成功数、失败数、状态报告未返回数
+     * @param paras
+     * @return 返回的集合中使用“0”，“1”，“2”表示成功、未返回、失败
+     * @throws IOException
+     */
+    @Override
+    public Map<String, Long> stataStatSendStatus(String paras) throws IOException {
+        SmsStatusDTO smsStatusDTO = JSON.parseObject(paras, SmsStatusDTO.class);
+        Map<String, Long> statresule = new HashMap<>();
+        int success=0;//成功0
+        int unreturn=0;//未返回1
+        int failure=0;//失败2
+        SearchRequest request = new SearchRequest();
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //聚合查询的时候默认查询数据是10条，因此在此指定查询数据条数。
+        searchSourceBuilder.size(100);
+        RangeQueryBuilder sendTime = null;
+        TermQueryBuilder clientId=null;
+        BoolQueryBuilder must = new BoolQueryBuilder();
+        if (clientId != null) {
+            clientId = QueryBuilders.termQuery("clientId", smsStatusDTO.getClientID());
+            must.must(clientId);
+        }
+        if (smsStatusDTO.getStartTime() != null && smsStatusDTO.getEndTime() != null) {
+            sendTime=QueryBuilders.rangeQuery("sendTime").from(smsStatusDTO.getStartTime()).to(smsStatusDTO.getEndTime());
+            must.must(sendTime);
+        } else if (smsStatusDTO.getStartTime() != null && smsStatusDTO.getEndTime() == null) {
+            sendTime=QueryBuilders.rangeQuery("sendTime").gte(smsStatusDTO.getStartTime());
+            must.must(sendTime);
+        }else {
+            sendTime=QueryBuilders.rangeQuery("sendTime").lte(smsStatusDTO.getEndTime());
+            must.must(sendTime);
+        }
+        searchSourceBuilder.query(must);
+        request.source(searchSourceBuilder);
+        SearchResponse search = client.search(request, RequestOptions.DEFAULT);
+        SearchHits hits = search.getHits();
+        SearchHit[] searchHits = hits.getHits();
+        for (SearchHit searchHit : searchHits) {
+            Map<String, Object> sourceAsMap = searchHit.getSourceAsMap();
+            int reportState =Integer.parseInt(String.valueOf(sourceAsMap.get("reportState"))) ;
+            switch (reportState) {
+                case 0:success++;break;
+                case 1:unreturn++;break;
+                case 2:failure++;break;
+            }
+
+        }
+        statresule.put("0",new Long(success));
+        statresule.put("1", new Long(unreturn));
+        statresule.put("2", new Long(failure));
+        System.err.println("状态信息："+success+"   "+unreturn+"   "+failure);
+        return statresule;
+    }
+
 }

@@ -34,7 +34,7 @@ public class SearchController {
     }
 
     @RequestMapping(value = "/statStatus", method = RequestMethod.POST)
-    public Map<String, Long> statSendStatus(@RequestParam("paras") String paras){
-        return null;
+    public Map<String, Long> statSendStatus(@RequestParam("paras") String paras) throws Exception {
+        return searchApi.stataStatSendStatus(paras);
     }
 }

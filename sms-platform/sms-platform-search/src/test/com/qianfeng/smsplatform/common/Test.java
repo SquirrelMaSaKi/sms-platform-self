@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.SearchServiceApplication;
 import com.qianfeng.smsplatform.search.service.SearchApi;
+import com.qianfeng.smsplatform.search.util.SearchPojo;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -11,7 +12,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -68,12 +68,11 @@ public class Test {
 
     @org.junit.Test
     public void testGet() throws Exception {
-        HashMap map = new HashMap();
-        map.put("aaa","aa");
-        String json = objectMapper.writeValueAsString(map);
-        System.err.println("=====================================");
-        System.err.println("===============es总数据数==================");
-        System.err.println(searchApi.getCount(json));
+        SearchPojo searchPojo = new SearchPojo();
+        searchPojo.setKeyword("我爱你");
+        searchPojo.setStart(1);
+        searchPojo.setRows(10);
+        String json = objectMapper.writeValueAsString(searchPojo);
         List<Map> search = searchApi.search(json);
         System.err.println();
     }

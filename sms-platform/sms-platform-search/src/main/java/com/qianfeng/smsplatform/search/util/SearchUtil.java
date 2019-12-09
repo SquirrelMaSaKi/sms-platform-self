@@ -125,7 +125,7 @@ public class SearchUtil {
 
         BoolQueryBuilder boolQueryBuilder = new BoolQueryBuilder();
         //如果这个appkey不等于空代表有这个查询条件
-        Object messageContent = searchPojo.getMessageContent();
+        Object messageContent = searchPojo.getKeyword();
         Object startTime = searchPojo.getStartTime();
         Object endTime = searchPojo.getEndTime();
         Object srcNumber = searchPojo.getMobile();
@@ -141,7 +141,7 @@ public class SearchUtil {
             boolQueryBuilder.must(srcNumberTerm);
         }
         //关键字查询
-        if (messageContent != null && srcNumber !="") {
+        if (messageContent != null && messageContent !="") {
             keywordTerm = QueryBuilders.matchQuery("messageContent", messageContent.toString());
             boolQueryBuilder.must(keywordTerm);
         }
