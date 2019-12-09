@@ -57,7 +57,7 @@ import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.*;
 */
 @Slf4j
 @Component
-@RabbitListener(queues = TOPIC_PRE_SEND, concurrency = "10")   //多线程
+@RabbitListener(queues = TOPIC_PRE_SEND, concurrency = "100")   //多线程
 public class ReceiveMessage {
     @Autowired
     private Map<String, FilterService> filterServicesMap;    //所有实现了FilterService接口的类对象都会在map中,key为servicename,value为对象
