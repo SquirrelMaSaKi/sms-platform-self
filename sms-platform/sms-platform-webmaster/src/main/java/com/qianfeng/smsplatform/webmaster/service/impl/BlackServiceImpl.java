@@ -79,13 +79,13 @@ public class BlackServiceImpl implements BlackService {
         }
         List<TBlackList> tBlackLists = tBlackListMapper.selectByExample(example);
 
-        //批量放入缓存
-        for (TBlackList tBlackList : tBlackLists) {
-            String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_BLACK + tBlackList.getMobile());
-            if (string==null || string.trim().length() == 0 || string.equals("null")) {
-                cacheFeign.setString(CacheConstants.CACHE_PREFIX_BLACK+tBlackList.getMobile(), "1");
-            }
-        }
+//        //批量放入缓存
+//        for (TBlackList tBlackList : tBlackLists) {
+//            String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_BLACK + tBlackList.getMobile());
+//            if (string==null || string.trim().length() == 0 || string.equals("null")) {
+//                cacheFeign.setString(CacheConstants.CACHE_PREFIX_BLACK+tBlackList.getMobile(), "1");
+//            }
+//        }
 
         PageInfo<TBlackList> info = new PageInfo<>(tBlackLists);
         long total = info.getTotal();

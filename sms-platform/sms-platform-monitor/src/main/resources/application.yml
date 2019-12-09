@@ -17,10 +17,16 @@ monitorFeeJob:
   shardingTotalCount: 1
   shardingItemParameters: null
 
+monitorReportJob:
+  cron: 0/10 * * * * ?
+  shardingTotalCount: 1
+  shardingItemParameters: null
+
 #报警参数
 alert:
   gatewayQueue:
-    size: 10000
+    size: 100
+    #size: 0
   #  少于100元报警，这里以厘为单位
   fee: 100000
 

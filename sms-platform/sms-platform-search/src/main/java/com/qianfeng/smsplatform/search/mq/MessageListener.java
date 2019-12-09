@@ -2,7 +2,8 @@ package com.qianfeng.smsplatform.search.mq;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qianfeng.smsplatform.common.constants.RabbitMqConsants;
-import com.qianfeng.smsplatform.search.model.Standard_Submit;
+import com.qianfeng.smsplatform.common.model.Standard_Report;
+import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.service.SearchApi;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
@@ -27,19 +28,32 @@ public class MessageListener {
     private ObjectMapper objectMapper;
 
     /**
-     * 监听队列
+     * 监听下发日志队列
+     * 采用多线程的方式消费对象
+     *
      * @param message
      */
-    @RabbitListener(queues = RabbitMqConsants.TOPIC_PRE_SEND,concurrency ="10")
-    public void queueListener(Standard_Submit message) throws Exception {
-        System.err.println("=====================================================");
-        //        Standard_Submit standard_submit = objectMapper.readValue(message, Standard_Submit.class);
-        //        json字符串转对象或者转map用,如果从队列中收到的为对象,就不用转了
+    @RabbitListener(queues = RabbitMqConsants.TOPIC_SMS_SEND_LOG, concurrency = "10")
+    public void sendLoglistener(Standard_Submit message) throws Exception {
+        //json字符串转对象或者转map用, 如果从队列中收到的为对象, 就不用转了
+
+        //Standard_Submit standard_submit = objectMapper.readValue(message, Standard_Submit.class);
         String json = objectMapper.writeValueAsString(message);
+        log.debug(json);
         searchApi.add(json);
-        log.error("-----------------------------------");
-        log.error("====================================================================");
-        log.error(json);
+    }
+
+    @RabbitListener(queues = RabbitMqConsants.TOPIC_PUSH_SMS_REPORT, concurrency = "10")
+    public void reportQueueListener(Standard_Report report) throws Exception {
+        Standard_Submit submit = new Standard_Submit();
+        submit.setDestMobile(report.getMobile());
+        submit.setReportState(report.getState());
+        submit.setErrorCode(report.getErrorCode());
+        submit.setSrcNumber(report.getSrcID()+"");
+        submit.setClientID((int) report.getClientID());
+        submit.setMsgid(report.getMsgId());
+        // 调用search模块
+        searchApi.update(submit);
     }
 
 }

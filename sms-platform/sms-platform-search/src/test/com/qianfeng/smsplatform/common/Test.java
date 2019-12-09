@@ -1,8 +1,8 @@
 package com.qianfeng.smsplatform.common;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.SearchServiceApplication;
-import com.qianfeng.smsplatform.search.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.service.SearchApi;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +44,9 @@ public class Test {
     @org.junit.Test
     public void testInsert() throws Exception {
         Standard_Submit bean = new Standard_Submit();
-        bean.setClientID(17700000);
+        bean.setClientID(17700005);
         bean.setSrcNumber("15180452349");
-        bean.setMessagePriority((short)12);
+        bean.setMessagePriority((short)11);
         bean.setSrcSequenceId(12348765);
         bean.setGatewayID(7777);
         bean.setProductID(7777);
@@ -54,19 +54,25 @@ public class Test {
         bean.setMessageContent("88888");
         bean.setErrorCode("500");
         bean.setSendTime(new Date());
-        bean.setOperatorId(7777);
-        bean.setProvinceId(2357);
+        bean.setOperatorId(9999);
+        bean.setProvinceId(9999);
         bean.setCityId(5);
-        bean.setSource(1);
+        bean.setSource(9);
         String json = objectMapper.writeValueAsString(bean);
+        /*for (int i = 0; i < 15; i++) {
+            bean.setProvinceId(i);
+            searchApi.add(json);
+        }*/
         searchApi.add(json);
     }
 
     @org.junit.Test
     public void testGet() throws Exception {
         HashMap map = new HashMap();
-        map.put("cityId",5);
         String json = objectMapper.writeValueAsString(map);
+        System.err.println("=====================================");
+        System.err.println("===============es总数据数==================");
+        System.err.println(searchApi.getCount(json));
         List<Map> search = searchApi.search(json);
         System.err.println();
     }
