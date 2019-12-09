@@ -147,7 +147,6 @@ public class SearchApiImpl implements SearchApi {
             String source = searchHit.getSourceAsString();
             //这是原始的数据, 将其中的发送时间更改成long 类型
             Map data = objectMapper.readValue(source, Map.class);
-            System.err.println("data="+data.toString());
             String sendTime1 = (String) data.get("sendTime");
             Date sendTime = simpleDateFormat.parse(sendTime1);
             long time = sendTime.getTime();
