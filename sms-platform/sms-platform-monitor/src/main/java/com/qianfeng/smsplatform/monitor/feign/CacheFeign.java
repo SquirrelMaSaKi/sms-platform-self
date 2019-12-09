@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import java.util.Map;
 import java.util.Set;
 
-@FeignClient(value = "CACHE-SERVICE")
+@FeignClient(value = "CACHE-SERVICE", fallback = FeignFallBack.class)
 public interface CacheFeign {
     @RequestMapping("/cache/string/get/{key}")
     String getString(@PathVariable("key") String key);

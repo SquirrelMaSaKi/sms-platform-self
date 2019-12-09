@@ -105,11 +105,11 @@ public class ClientChannelServiceImpl implements ClientChannelService {
             tClientChannel.setChannelname(channelname);
 
             //同步到缓存
-            Map<String, Object> stringObjectMap = cacheFeign.hGet(CacheConstants.CACHE_PREFIX_ROUTER + tClientChannel.getClientid());
-            if (stringObjectMap == null || stringObjectMap.size() == 0) {
-                Map<String, Object> stringObjectMap1 = JsonUtils.object2Map(tClientChannel);
-                cacheFeign.setHashMapByMap(CacheConstants.CACHE_PREFIX_ROUTER+tClientChannel.getClientid(), stringObjectMap1);
-            }
+//            Map<String, Object> stringObjectMap = cacheFeign.hGet(CacheConstants.CACHE_PREFIX_ROUTER + tClientChannel.getClientid());
+//            if (stringObjectMap == null || stringObjectMap.size() == 0) {
+//                Map<String, Object> stringObjectMap1 = JsonUtils.object2Map(tClientChannel);
+//                cacheFeign.setHashMapByMap(CacheConstants.CACHE_PREFIX_ROUTER+tClientChannel.getClientid(), stringObjectMap1);
+//            }
         }
         PageInfo<TClientChannel> info = new PageInfo<>(tClientChannels);
         long total = info.getTotal();

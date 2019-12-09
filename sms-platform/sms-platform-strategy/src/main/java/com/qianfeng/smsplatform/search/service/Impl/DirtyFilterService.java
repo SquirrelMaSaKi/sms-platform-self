@@ -57,6 +57,7 @@ import static com.qianfeng.smsplatform.common.constants.StrategyConstants.STRATE
 public class DirtyFilterService implements FilterService {
 //    private String[] str={"卧槽","造反","打劫","撕票"};
     @Autowired
+
     private CacheService cacheService;
 
     @Override
@@ -78,7 +79,8 @@ public class DirtyFilterService implements FilterService {
             String key=CACHE_PREFIX_DIRTYWORDS+list.get(i);
             System.out.println(key);
             System.out.println("脏词查询为"+cacheService.findByKey(key));
-               if(cacheService.findByKey(key)!=null && !cacheService.findByKey(key).equals("null")) {
+               if(cacheService.findByKey(key)!=null && !cacheService.findByKey(key).equals(
+                       "null")) {
                    message.setErrorCode(STRATEGY_ERROR_DIRTYWORDS);
                    log.error("说脏话了");
                    return message;

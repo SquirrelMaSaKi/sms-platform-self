@@ -22,13 +22,14 @@ public class CheckServiceImpl implements CheckService {
 
     @Override
     public String check(String remoteAddr, String clientID, String srcID, String mobile, String content, String pwd) {
-        clientID = CACHE_PREFIX_CLIENT + clientID;
-        Map<Object, Object> map = cacheServcie.hGet(clientID);
-
         //检查是否有ClientID
         if (MyStringUtils.isEmpty(clientID)) {
             return InterfaceExceptionDict.RETURN_STATUS_CLIENTID_ERROR;
         }
+        clientID = CACHE_PREFIX_CLIENT + clientID;
+        Map<Object, Object> map = cacheServcie.hGet(clientID);
+
+
         if (map == null) {
             return InterfaceExceptionDict.RETURN_STATUS_CLIENTID_ERROR;
         }
@@ -53,7 +54,7 @@ public class CheckServiceImpl implements CheckService {
         }
 
         //检查传过来的内容大小
-        if (MyStringUtils.isEmpty(content) || content.length() > 500) {
+        if (MyStringUtils.isEmpty(content) || content.trim().length() > 500) {
             return InterfaceExceptionDict.RETURN_STATUS_MESSAGE_ERROR;
         }
 

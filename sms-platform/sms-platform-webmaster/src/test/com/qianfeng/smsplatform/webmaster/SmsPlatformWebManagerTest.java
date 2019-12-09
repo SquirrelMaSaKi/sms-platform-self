@@ -1,19 +1,14 @@
 package com.qianfeng.smsplatform.webmaster;
 
-import com.alibaba.fastjson.JSONObject;
 import com.qianfeng.smsplatform.common.constants.CacheConstants;
 import com.qianfeng.smsplatform.webmaster.dao.TClientChannelMapper;
+import com.qianfeng.smsplatform.webmaster.dao.TInstMapper;
 import com.qianfeng.smsplatform.webmaster.feign.CacheFeign;
-import com.qianfeng.smsplatform.webmaster.pojo.TClientBusiness;
-import com.qianfeng.smsplatform.webmaster.pojo.TClientChannel;
-import com.qianfeng.smsplatform.webmaster.service.ChannelService;
-import com.qianfeng.smsplatform.webmaster.service.ClientBusinessService;
-import com.qianfeng.smsplatform.webmaster.service.ClientChannelService;
+import com.qianfeng.smsplatform.webmaster.pojo.*;
+import com.qianfeng.smsplatform.webmaster.service.*;
 import com.qianfeng.smsplatform.webmaster.util.JsonUtils;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
@@ -30,13 +25,24 @@ public class SmsPlatformWebManagerTest {
     private ChannelService channelService;
 
     @Autowired
-    private ClientChannelService clientChannelService;
-
-    @Autowired
     private TClientChannelMapper tClientChannelMapper;
 
     @Autowired
     private CacheFeign cacheFeign;
+
+    @Autowired
+    private BlackService blackService;
+    @Autowired
+    private ClientBusinessService clientBusinessService;
+    @Autowired
+    private DirtywordService dirtywordService;
+    @Autowired
+    private PhaseService phaseService;
+    @Autowired
+    private TInstMapper tInstMapper;
+    @Autowired
+    private ClientChannelService clientChannelService;
+
 
     @Test
     public void testFindAllChannelIds() {
@@ -81,5 +87,84 @@ public class SmsPlatformWebManagerTest {
 //        System.err.println(byClientId.getPrice());
         TClientChannel tClientChannel = tClientChannelMapper.selectByClientId((long) 0);
         System.err.println(tClientChannel.getPrice());
+    }
+
+
+    /**
+     * Redis数据预热
+     */
+    @Test
+    public void preHeatRedis() {
+        //黑名单
+        List<TBlackList> tBlackLists = blackService.findAll();
+        for (TBlackList tBlackList : tBlackLists) {
+            String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_BLACK + tBlackList.getMobile());
+            if (string==null || string.trim().length() == 0 || string.equals("null")) {
+                cacheFeign.setString(CacheConstants.CACHE_PREFIX_BLACK+tBlackList.getMobile(), "1");
+            }
+        }
+
+        //用户
+        List<TClientBusiness> tClientBusinesses = clientBusinessService.findAll();
+        for (TClientBusiness tClientBusiness : tClientBusinesses) {
+            Map<String, Object> map = cacheFeign.hGet(CacheConstants.CACHE_PREFIX_CLIENT + tClientBusiness.getId());
+            if (map==null || map.size() == 0) {
+                Map<String, Object> map1 = JsonUtils.object2Map(tClientBusiness);
+                cacheFeign.setHashMapByMap(CacheConstants.CACHE_PREFIX_CLIENT+tClientBusiness.getId(), map1);
+            }
+        }
+
+        //脏词
+        List<TDirtyword> tDirtywords = dirtywordService.findAll();
+        for (TDirtyword tDirtyword : tDirtywords) {
+            String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_DIRTYWORDS + tDirtyword.getDirtyword());
+            if (string==null || string.trim().length()==0 || string.equals("null")) {
+                cacheFeign.setString(CacheConstants.CACHE_PREFIX_DIRTYWORDS+tDirtyword.getDirtyword(), "1");
+            }
+        }
+
+        //号段
+        List<TPhase> tPhases = phaseService.findALL();
+        for (TPhase message : tPhases) {
+            Long provId = message.getProvId();
+            TInst tInst1 = tInstMapper.selectByPrimaryKey(provId);
+            message.setProvName(tInst1.getAreaname());
+            Long cityId = message.getCityId();
+            TInstExample tInstExample = new TInstExample();
+            TInstExample.Criteria criteria = tInstExample.createCriteria();
+            criteria.andIdEqualTo(cityId);
+            criteria.andParentidEqualTo(provId);
+            List<TInst> tInsts = tInstMapper.selectByExample(tInstExample);
+            if(tInsts!=null&&tInsts.size()>0){
+                TInst tInst = tInsts.get(0);
+                message.setCityName(tInst.getAreaname());
+            }
+
+            //批量放入缓存
+            String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_PHASE+message.getPhase());
+            if (string==null || string.trim().length()==0 || string.equals("null")) {
+                cacheFeign.setString(CacheConstants.CACHE_PREFIX_PHASE+message.getPhase(), provId+"&"+cityId);
+            }
+        }
+
+        //路由信息
+        List<TClientChannel> tClientChannels = clientChannelService.findAll();
+        for (TClientChannel tClientChannel : tClientChannels) {
+            Long clientid = tClientChannel.getClientid();
+            TClientBusiness tClientBusiness = clientBusinessService.findById(clientid);
+            String corpname = tClientBusiness.getCorpname();
+            tClientChannel.setCorpname(corpname);
+            long channelid = (long)tClientChannel.getChannelid();
+            TChannel tChannel= channelService.findById(channelid);
+            String channelname = tChannel.getChannelname();
+            tClientChannel.setChannelname(channelname);
+
+            //同步到缓存
+            Map<String, Object> stringObjectMap = cacheFeign.hGet(CacheConstants.CACHE_PREFIX_ROUTER + tClientChannel.getClientid());
+            if (stringObjectMap == null || stringObjectMap.size() == 0) {
+                Map<String, Object> stringObjectMap1 = JsonUtils.object2Map(tClientChannel);
+                cacheFeign.setHashMapByMap(CacheConstants.CACHE_PREFIX_ROUTER+tClientChannel.getClientid(), stringObjectMap1);
+            }
+        }
     }
 }

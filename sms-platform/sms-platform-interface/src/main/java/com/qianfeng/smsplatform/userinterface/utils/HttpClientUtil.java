@@ -15,6 +15,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -72,6 +73,9 @@ public class HttpClientUtil {
 		try {
 			// 创建Http Post请求
 			HttpPost httpPost = new HttpPost(url);
+			//这样解决不了
+			//httpPost.setHeader("Content-Type", "text/html;charset=utf-8");
+
 			// 创建参数列表
 			if (param != null) {
 				List<NameValuePair> paramList = new ArrayList<>();
@@ -79,13 +83,14 @@ public class HttpClientUtil {
 					paramList.add(new BasicNameValuePair(key, param.get(key)));
 				}
 				// 模拟表单
-				UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramList);
+				UrlEncodedFormEntity entity = new UrlEncodedFormEntity(paramList,Charset.forName("UTF-8"));
 				httpPost.setEntity(entity);
 			}
 			// 执行http请求
 			response = httpClient.execute(httpPost);
 			resultString = EntityUtils.toString(response.getEntity(), "utf-8");
 			int statusCode = response.getStatusLine().getStatusCode();
+			//如果没有发送成功就返回ERROR
 			if (statusCode != 200) {
 				System.err.println("resultString》》》》》》》"+resultString);
 				return "error";
@@ -95,6 +100,7 @@ public class HttpClientUtil {
 
 		} finally {
 			try {
+				if (response!=null)
 				response.close();
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
