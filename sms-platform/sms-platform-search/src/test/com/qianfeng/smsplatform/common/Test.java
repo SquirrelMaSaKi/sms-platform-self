@@ -140,4 +140,10 @@ public class Test {
         List<Map> search = searchApi.search(json);
         System.err.println();
     }
+
+    public void test(){
+        Date a = new Date();
+        long l = Long.parseLong(a.toString());
+        System.err.println(l);
+    }
 }

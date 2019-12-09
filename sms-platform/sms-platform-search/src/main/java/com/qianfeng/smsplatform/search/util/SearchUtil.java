@@ -132,7 +132,7 @@ public class SearchUtil {
 
         //号码查询
         if(mobile != null && mobile !=""){
-            srcNumberTerm = new TermQueryBuilder("srcNumber",mobile.toString());
+            srcNumberTerm = new TermQueryBuilder("mobile",mobile.toString());
             boolQueryBuilder.must(srcNumberTerm);
         }
         //关键字查询
