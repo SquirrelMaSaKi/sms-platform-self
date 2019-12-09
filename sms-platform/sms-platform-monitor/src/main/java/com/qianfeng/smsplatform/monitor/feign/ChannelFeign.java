@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import java.util.List;
 
-@FeignClient(value = "SMS-PLATFORM-WEBMASTER")
+@FeignClient(value = "SMS-PLATFORM-WEBMASTER", fallback = FeignFallBack.class)
 public interface ChannelFeign {
     @RequestMapping("/sys/channel/ids")
     List<Long> getChannelIds();

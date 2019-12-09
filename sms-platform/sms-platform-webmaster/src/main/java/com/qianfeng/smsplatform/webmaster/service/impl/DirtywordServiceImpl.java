@@ -78,13 +78,13 @@ public class DirtywordServiceImpl implements DirtywordService {
         }
         List<TDirtyword> tDirtywords = tDirtywordMapper.selectByExample(example);
 
-        //同步到缓存
-        for (TDirtyword tDirtyword : tDirtywords) {
-            String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_DIRTYWORDS + tDirtyword.getDirtyword());
-            if (string==null || string.trim().length()==0 || string.equals("null")) {
-                cacheFeign.setString(CacheConstants.CACHE_PREFIX_DIRTYWORDS+tDirtyword.getDirtyword(), "1");
-            }
-        }
+//        //同步到缓存
+//        for (TDirtyword tDirtyword : tDirtywords) {
+//            String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_DIRTYWORDS + tDirtyword.getDirtyword());
+//            if (string==null || string.trim().length()==0 || string.equals("null")) {
+//                cacheFeign.setString(CacheConstants.CACHE_PREFIX_DIRTYWORDS+tDirtyword.getDirtyword(), "1");
+//            }
+//        }
 
         PageInfo<TDirtyword> info = new PageInfo<>(tDirtywords);
         long total = info.getTotal();

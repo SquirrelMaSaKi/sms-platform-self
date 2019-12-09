@@ -105,10 +105,10 @@ public class PhaseServiceImpl implements PhaseService {
             }
 
             //批量放入缓存
-            String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_PHASE+message.getPhase());
-            if (string==null || string.trim().length()==0 || string.equals("null")) {
-                cacheFeign.setString(CacheConstants.CACHE_PREFIX_PHASE+message.getPhase(), provId+"&"+cityId);
-            }
+//            String string = cacheFeign.getString(CacheConstants.CACHE_PREFIX_PHASE+message.getPhase());
+//            if (string==null || string.trim().length()==0 || string.equals("null")) {
+//                cacheFeign.setString(CacheConstants.CACHE_PREFIX_PHASE+message.getPhase(), provId+"&"+cityId);
+//            }
         }
 
         PageInfo<TPhase> info = new PageInfo<>(messages);
