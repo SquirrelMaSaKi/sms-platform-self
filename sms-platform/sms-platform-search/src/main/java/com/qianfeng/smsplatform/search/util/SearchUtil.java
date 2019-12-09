@@ -85,11 +85,6 @@ public class SearchUtil {
                 .field("index","true")
                 .endObject()
 
-                .startObject("errorCode")
-                .field("type", "keyword")
-                .field("index","true")
-                .endObject()
-
                 .startObject("reportState")
                 .field("type", "long")
                 .field("index","true")
@@ -128,7 +123,7 @@ public class SearchUtil {
         Object messageContent = searchPojo.getKeyword();
         Object startTime = searchPojo.getStartTime();
         Object endTime = searchPojo.getEndTime();
-        Object srcNumber = searchPojo.getMobile();
+        Object mobile = searchPojo.getMobile();
         Object clientID = searchPojo.getClientID();
         MatchQueryBuilder keywordTerm = null;
         RangeQueryBuilder receiveTimeQuery = null;
@@ -136,8 +131,8 @@ public class SearchUtil {
         TermQueryBuilder clientIDTerm = null;
 
         //号码查询
-        if(srcNumber != null && srcNumber !=""){
-            srcNumberTerm = new TermQueryBuilder("srcNumber",srcNumber.toString());
+        if(mobile != null && mobile !=""){
+            srcNumberTerm = new TermQueryBuilder("srcNumber",mobile.toString());
             boolQueryBuilder.must(srcNumberTerm);
         }
         //关键字查询
@@ -147,17 +142,16 @@ public class SearchUtil {
         }
         //时间间隔查询
         if (startTime != null & endTime != null) {
-            Date start = simpleDateFormat.parse(startTime.toString());
-            Date end = simpleDateFormat.parse(endTime.toString());
-            receiveTimeQuery = QueryBuilders.rangeQuery("startTime").gte(start.getTime()).lte(end.getTime());
+            //如果开始和结束时间都有，那么从es中查询sendTime。
+            receiveTimeQuery = QueryBuilders.rangeQuery("sendTime").from(searchPojo.getStartTime()).to(searchPojo.getEndTime());
             boolQueryBuilder.must(receiveTimeQuery);
         } else if (startTime != null & endTime == null) {
             Date start = simpleDateFormat.parse(startTime.toString());
-            receiveTimeQuery = QueryBuilders.rangeQuery("startTime").gte(start.getTime());
+            receiveTimeQuery = QueryBuilders.rangeQuery("sendTime").gte(start.getTime());
             boolQueryBuilder.must(receiveTimeQuery);
         } else if (startTime == null & endTime != null) {
             Date end = simpleDateFormat.parse(endTime.toString());
-            receiveTimeQuery = QueryBuilders.rangeQuery("startTime").lte(end.getTime());
+            receiveTimeQuery = QueryBuilders.rangeQuery("sendTime").lte(end.getTime());
             boolQueryBuilder.must(receiveTimeQuery);
         }
         //根据clientID查询

@@ -43,6 +43,11 @@ public class MessageListener {
         searchApi.add(json);
     }
 
+    /**
+     * 更新状态报告
+     * @param report
+     * @throws Exception
+     */
     @RabbitListener(queues = RabbitMqConsants.TOPIC_PUSH_SMS_REPORT, concurrency = "10")
     public void reportQueueListener(Standard_Report report) throws Exception {
         Standard_Submit submit = new Standard_Submit();

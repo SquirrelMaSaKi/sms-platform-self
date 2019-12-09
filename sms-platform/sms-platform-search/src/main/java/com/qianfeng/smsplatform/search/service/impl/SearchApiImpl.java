@@ -39,10 +39,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 /**
@@ -57,6 +55,8 @@ public class SearchApiImpl implements SearchApi {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private Logger logger = LoggerFactory.getLogger(SearchApiImpl.class);
     @Value("${elasticsearch.index.name}")
@@ -145,7 +145,6 @@ public class SearchApiImpl implements SearchApi {
             builder.highlighter(highlightBuilder);
         }
 
-
         SearchRequest searchRequest = new SearchRequest(indexName);
         searchRequest.source(builder);
         SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
@@ -157,8 +156,12 @@ public class SearchApiImpl implements SearchApi {
         for (SearchHit searchHit : searchHits) {
             //以json的方式获取数据
             String source = searchHit.getSourceAsString();
-            //这是原始的数据
+            //这是原始的数据, 将其中的发送时间更改成long 类型
             Map data = objectMapper.readValue(source, Map.class);
+            String sendTime1 = (String) data.get("sendTime");
+            Date sendTime = simpleDateFormat.parse(sendTime1);
+            long time = sendTime.getTime();
+            data.put("sendTime",time);
             //可能会有高亮数据,获取高亮相关的数据
             Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
             HighlightField field = highlightFields.get("requestContent");
