@@ -35,6 +35,7 @@ public class SmsInterfaceServlet extends HttpServlet {
         String srcID = request.getParameter("srcID");
         String mobile = request.getParameter("mobile");
         String content = request.getParameter("content");
+        System.err.println("content：》》》"+content);
         String pwd = request.getParameter("pwd");
         String remoteAddr = getRemoteAddr(request);
         System.err.println(remoteAddr);
