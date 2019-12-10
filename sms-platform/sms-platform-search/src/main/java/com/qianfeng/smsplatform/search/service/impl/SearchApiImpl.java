@@ -108,40 +108,29 @@ public class SearchApiImpl implements SearchApi {
         List list = new ArrayList();
         //和查询数量一样,根据条件查询结果,但是我们可能会有分页,可能还有高亮
         //将用户传递的json转换为map
-        SearchPojo value = objectMapper.readValue(params, SearchPojo.class);
-        SearchSourceBuilder builder = SearchUtil.getSearchSourceBuilder(value);
+        SearchPojo searchPojo = objectMapper.readValue(params, SearchPojo.class);
+        SearchSourceBuilder builder = SearchUtil.getSearchSourceBuilder(searchPojo);
         //设置开始位置和总行数
         int start  = 0;
         int rows = 0;
-        if(value.getStart() == 0){
+        if(searchPojo.getStart() == 0){
             start = 1;
         }else{
-            start = value.getStart();
+            start = searchPojo.getStart();
         }
-        if (value.getRows() == 0){
+        if (searchPojo.getRows() == 0){
             rows = 10;
         }else{
-            rows = value.getRows();
+            rows = searchPojo.getRows();
         }
         builder.from(start);
         builder.size(rows);
-        //应该要设置高亮数据,理论上高亮的标签应该是用户传递的,当然我们也有默认的
         //如果传递了请求参数才设置高亮
-        if (value.getKeyword() != null) {
-            //高亮的前缀和后缀
-            Object highlightpretag = value.getHighLightPreTag();
-            Object highlightposttag = value.getHighLightPostTag();
-
-            if (highlightposttag == null || "".equalsIgnoreCase(highlightposttag.toString().trim())) {
-                highlightposttag = "</span>";
-            }
-            if (highlightpretag == null || "".equalsIgnoreCase(highlightpretag.toString().trim())) {
-                highlightpretag = "<span color='green'>";
-            }
+        if (searchPojo.getKeyword() != null) {
             HighlightBuilder highlightBuilder = new HighlightBuilder();
-            highlightBuilder.field("requestContent");
-            highlightBuilder.preTags(highlightpretag.toString());
-            highlightBuilder.postTags(highlightposttag.toString());
+            highlightBuilder.requireFieldMatch(false).field("messageContent")
+                    .preTags(searchPojo.getHighLightPreTag()).postTags(searchPojo.getHighLightPostTag());
+            //配置高亮
             builder.highlighter(highlightBuilder);
         }
 
@@ -164,15 +153,15 @@ public class SearchApiImpl implements SearchApi {
             data.put("sendTime",time);
             //可能会有高亮数据,获取高亮相关的数据
             Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
-            HighlightField field = highlightFields.get("requestContent");
+            HighlightField field = highlightFields.get("messageContent");
             if (field != null) {
                 //有高亮
                 Text[] fragments = field.getFragments();
                 if (fragments != null) {
                     //高亮内容
-                    String hlcontent = fragments[0].string();
+                    String hlcontent = fragments[0].toString();
                     //替换原始数据为高亮数据
-                    data.put("requestContent", hlcontent);
+                    data.put("messageContent", hlcontent);
                 }
             }
             list.add(data);
