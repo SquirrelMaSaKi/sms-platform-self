@@ -50,6 +50,7 @@ public class MessageListener {
      */
     @RabbitListener(queues = RabbitMqConsants.TOPIC_UPDATE_SMS_REPORT, concurrency = "10")
     public void reportQueueListener(Standard_Report report) throws Exception {
+        log.debug("接收到消息{}",report);
         Standard_Submit submit = new Standard_Submit();
         submit.setDestMobile(report.getMobile());
         submit.setReportState(report.getState());

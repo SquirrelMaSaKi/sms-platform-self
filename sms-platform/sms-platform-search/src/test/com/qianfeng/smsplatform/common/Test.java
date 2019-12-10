@@ -44,27 +44,24 @@ public class Test {
     @org.junit.Test
     public void testInsert() throws Exception {
         Standard_Submit bean = new Standard_Submit();
-        bean.setClientID(17700005);
+        bean.setClientID(17700004);
         bean.setSrcNumber("1518045234");
         bean.setMessagePriority((short)11);
         bean.setSrcSequenceId(12348765);
-        bean.setGatewayID(7777);
-        bean.setProductID(7777);
-        bean.setDestMobile("7777777");
+        bean.setGatewayID(8888);
+        bean.setProductID(8888);
+        bean.setDestMobile("8888888");
         bean.setMessageContent("新华社澳门12月8日电 题：推进“一国两制”实践在澳门行稳致远——访澳门特区候任行政长官贺一诚\n" +
-                "对于建设以中华文化为主流、多元文化共存的交流合作基地，贺一诚充满信心。化交流传统，不同文化相对立。“澳门将进一步做好文化遗产保护，推动中西文化交流。”\n" +
-                "\n" +
-                "10月底，全国人大常委会公布了关于授权澳门特别行政区对横琴口岸澳方口岸区及相关延伸区实施管辖的决定。贺一:" +
-                        ""+
-                "“希望中央政府及各部门能够继续给予澳门特区适当的帮助，促进澳门维护好繁荣稳定。澳门也将努力为国家发展大局作出更大贡献。”贺一诚说。（完）");
+                "“希望中央政府及各部门能够继续给予澳门特区适当的帮助，更大贡献。" +
+                "”贺一诚说。（完）");
         bean.setErrorCode("500");
         bean.setSendTime(new Date());
-        bean.setOperatorId(9999);
-        bean.setProvinceId(9999);
-        bean.setCityId(5);
-        bean.setSource(9);
+        bean.setOperatorId(8888);
+        bean.setProvinceId(8888);
+        bean.setCityId(8);
+        bean.setSource(8);
         String json = objectMapper.writeValueAsString(bean);
-        for (int i = 29; i < 40; i++) {
+        for (int i = 1; i < 11; i++) {
             bean.setSrcNumber("1518045234" + i);
             searchApi.add(json);
         }
