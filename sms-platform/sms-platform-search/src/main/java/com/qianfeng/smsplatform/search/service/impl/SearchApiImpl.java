@@ -247,12 +247,7 @@ public class SearchApiImpl implements SearchApi {
         //聚合查询的时候默认查询数据是10条，因此在此指定查询数据条数。
         searchSourceBuilder.size(100);
         RangeQueryBuilder sendTime = null;
-        TermQueryBuilder clientId=null;
         BoolQueryBuilder must = new BoolQueryBuilder();
-        if (clientId != null) {
-            clientId = QueryBuilders.termQuery("clientId", smsStatusDTO.getClientID());
-            must.must(clientId);
-        }
         if (smsStatusDTO.getStartTime() != null && smsStatusDTO.getEndTime() != null) {
             sendTime=QueryBuilders.rangeQuery("sendTime").from(smsStatusDTO.getStartTime()).to(smsStatusDTO.getEndTime());
             must.must(sendTime);
