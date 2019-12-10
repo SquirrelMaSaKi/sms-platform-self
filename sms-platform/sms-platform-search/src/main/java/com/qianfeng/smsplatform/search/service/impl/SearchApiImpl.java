@@ -3,7 +3,9 @@ package com.qianfeng.smsplatform.search.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
+import com.qianfeng.smsplatform.search.dto.SmsStatusDTO;
 import com.qianfeng.smsplatform.search.service.SearchApi;
+import com.qianfeng.smsplatform.search.util.SearchPojo;
 import com.qianfeng.smsplatform.search.util.SearchUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
@@ -21,7 +23,9 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
+import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -35,9 +39,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 
 /**
@@ -52,6 +55,8 @@ public class SearchApiImpl implements SearchApi {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    private static SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
     private Logger logger = LoggerFactory.getLogger(SearchApiImpl.class);
     @Value("${elasticsearch.index.name}")
@@ -103,55 +108,31 @@ public class SearchApiImpl implements SearchApi {
         List list = new ArrayList();
         //和查询数量一样,根据条件查询结果,但是我们可能会有分页,可能还有高亮
         //将用户传递的json转换为map
-        Map value = objectMapper.readValue(params, Map.class);
-        SearchSourceBuilder builder = SearchUtil.getSearchSourceBuilder(value);
-
-        //如果传递了分页参数 应该有分页,我们规定用户传递 start和end两个参数过来代表分页
-        //但是如果数据太多,用户又没有传递分页,咋办,我们应该有默认长度
-        Object start = value.get("startTime");
-        Object end = value.get("endTime");
-        if (start == null) {
+        SearchPojo searchPojo = objectMapper.readValue(params, SearchPojo.class);
+        SearchSourceBuilder builder = SearchUtil.getSearchSourceBuilder(searchPojo);
+        //设置开始位置和总行数
+        int start  = 0;
+        int rows = 0;
+        if(searchPojo.getStart() == 0){
             start = 1;
-        } else {
-            try {
-                start = Integer.parseInt(start.toString());
-            } catch (Exception e) {
-                start = 1;
-                e.printStackTrace();
-            }
+        }else{
+            start = searchPojo.getStart();
         }
-
-        if (end == null) {
-            end = 10;
-        } else {
-            try {
-                end = Integer.parseInt(end.toString());
-            } catch (Exception e) {
-                end = 10;
-                e.printStackTrace();
-            }
+        if (searchPojo.getRows() == 0){
+            rows = 10;
+        }else{
+            rows = searchPojo.getRows();
         }
-        builder.from((Integer.parseInt(start.toString()) - 1) * Integer.parseInt(end.toString(), Integer.parseInt(end.toString())));
-        //应该要设置高亮数据,理论上高亮的标签应该是用户传递的,当然我们也有默认的
+        builder.from(start);
+        builder.size(rows);
         //如果传递了请求参数才设置高亮
-        if (value.get("requestContent") != null) {
-            //高亮的前缀和后缀
-            Object highlightpretag = value.get("highlightpretag");
-            Object highlightposttag = value.get("highlightposttag");
-
-            if (highlightposttag == null || "".equalsIgnoreCase(highlightposttag.toString().trim())) {
-                highlightposttag = "</span>";
-            }
-            if (highlightpretag == null || "".equalsIgnoreCase(highlightpretag.toString().trim())) {
-                highlightpretag = "<span color='green'>";
-            }
+        if (searchPojo.getKeyword() != null) {
             HighlightBuilder highlightBuilder = new HighlightBuilder();
-            highlightBuilder.field("requestContent");
-            highlightBuilder.preTags(highlightpretag.toString());
-            highlightBuilder.postTags(highlightposttag.toString());
+            highlightBuilder.requireFieldMatch(false).field("messageContent")
+                    .preTags(searchPojo.getHighLightPreTag()).postTags(searchPojo.getHighLightPostTag());
+            //配置高亮
             builder.highlighter(highlightBuilder);
         }
-
 
         SearchRequest searchRequest = new SearchRequest(indexName);
         searchRequest.source(builder);
@@ -164,19 +145,23 @@ public class SearchApiImpl implements SearchApi {
         for (SearchHit searchHit : searchHits) {
             //以json的方式获取数据
             String source = searchHit.getSourceAsString();
-            //这是原始的数据
+            //这是原始的数据, 将其中的发送时间更改成long 类型
             Map data = objectMapper.readValue(source, Map.class);
+            String sendTime1 = (String) data.get("sendTime");
+            Date sendTime = simpleDateFormat.parse(sendTime1);
+            long time = sendTime.getTime();
+            data.put("sendTime",time);
             //可能会有高亮数据,获取高亮相关的数据
             Map<String, HighlightField> highlightFields = searchHit.getHighlightFields();
-            HighlightField field = highlightFields.get("requestContent");
+            HighlightField field = highlightFields.get("messageContent");
             if (field != null) {
                 //有高亮
                 Text[] fragments = field.getFragments();
                 if (fragments != null) {
                     //高亮内容
-                    String hlcontent = fragments[0].string();
+                    String hlcontent = fragments[0].toString();
                     //替换原始数据为高亮数据
-                    data.put("requestContent", hlcontent);
+                    data.put("messageContent", hlcontent);
                 }
             }
             list.add(data);
@@ -187,7 +172,7 @@ public class SearchApiImpl implements SearchApi {
     @Override
     public long getCount(String params) throws Exception {
         //将用户传递的json转换为map
-        Map value = objectMapper.readValue(params, Map.class);
+        SearchPojo value = objectMapper.readValue(params, SearchPojo.class);
         SearchSourceBuilder builder = SearchUtil.getSearchSourceBuilder(value);
         SearchRequest searchRequest = new SearchRequest(indexName);
         searchRequest.source(builder);
@@ -240,4 +225,64 @@ public class SearchApiImpl implements SearchApi {
         getIndexRequest.indices(indexName);
         return client.indices().exists(getIndexRequest, RequestOptions.DEFAULT);
     }
+
+
+
+    /**
+     * 查询某一个用户在某一个时间段：成功数、失败数、状态报告未返回数
+     * @param paras
+     * @return 返回的集合中使用“0”，“1”，“2”表示成功、未返回、失败
+     * @throws IOException
+     */
+    @Override
+    public Map<String, Long> stataStatSendStatus(String paras) throws IOException {
+        SmsStatusDTO smsStatusDTO = JSON.parseObject(paras, SmsStatusDTO.class);
+        Map<String, Long> statresule = new HashMap<>();
+        int success=0;//成功0
+        int unreturn=0;//未返回1
+        int failure=0;//失败2
+        SearchRequest request = new SearchRequest();
+
+        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
+        //聚合查询的时候默认查询数据是10条，因此在此指定查询数据条数。
+        searchSourceBuilder.size(100);
+        RangeQueryBuilder sendTime = null;
+        TermQueryBuilder clientId=null;
+        BoolQueryBuilder must = new BoolQueryBuilder();
+        if (clientId != null) {
+            clientId = QueryBuilders.termQuery("clientId", smsStatusDTO.getClientID());
+            must.must(clientId);
+        }
+        if (smsStatusDTO.getStartTime() != null && smsStatusDTO.getEndTime() != null) {
+            sendTime=QueryBuilders.rangeQuery("sendTime").from(smsStatusDTO.getStartTime()).to(smsStatusDTO.getEndTime());
+            must.must(sendTime);
+        } else if (smsStatusDTO.getStartTime() != null && smsStatusDTO.getEndTime() == null) {
+            sendTime=QueryBuilders.rangeQuery("sendTime").gte(smsStatusDTO.getStartTime());
+            must.must(sendTime);
+        }else {
+            sendTime=QueryBuilders.rangeQuery("sendTime").lte(smsStatusDTO.getEndTime());
+            must.must(sendTime);
+        }
+        searchSourceBuilder.query(must);
+        request.source(searchSourceBuilder);
+        SearchResponse search = client.search(request, RequestOptions.DEFAULT);
+        SearchHits hits = search.getHits();
+        SearchHit[] searchHits = hits.getHits();
+        for (SearchHit searchHit : searchHits) {
+            Map<String, Object> sourceAsMap = searchHit.getSourceAsMap();
+            int reportState =Integer.parseInt(String.valueOf(sourceAsMap.get("reportState"))) ;
+            switch (reportState) {
+                case 0:success++;break;
+                case 1:unreturn++;break;
+                case 2:failure++;break;
+            }
+
+        }
+        statresule.put("0",new Long(success));
+        statresule.put("1", new Long(unreturn));
+        statresule.put("2", new Long(failure));
+        System.err.println("状态信息："+success+"   "+unreturn+"   "+failure);
+        return statresule;
+    }
+
 }

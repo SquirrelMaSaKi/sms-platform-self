@@ -74,7 +74,7 @@ public class ClientBusinessServiceImpl implements ClientBusinessService {
 
     @Override
     public TClientBusiness findById(Long id) {
-        return null;
+        return tClientBusinessMapper.selectByPrimaryKey(id);
     }
 
 
@@ -92,21 +92,21 @@ public class ClientBusinessServiceImpl implements ClientBusinessService {
             example.setOrderByClause("id");
         }
         List<TClientBusiness> tClientBusinesses = tClientBusinessMapper.selectByExample(example);
-        for (TClientBusiness tClientBusiness : tClientBusinesses) {
-            Long id = tClientBusiness.getId();
+//        for (TClientBusiness tClientBusiness : tClientBusinesses) {
+//            Long id = tClientBusiness.getId();
 //            Integer paidValueStr  = (Integer)cacheService.getObject("CUSTOMER_FEE:" +id);
 //            if(!StringUtils.isEmpty(paidValueStr)){
 //                int i = paidValueStr/1000;
 //                tClientBusiness.setPaidValueStr(i+"元");
 //            }
-
-            //批量放入缓存
-            Map<String, Object> map = cacheFeign.hGet(CacheConstants.CACHE_PREFIX_CLIENT + id);
-            if (map==null || map.size() == 0) {
-                Map<String, Object> map1 = JsonUtils.object2Map(tClientBusiness);
-                cacheFeign.setHashMapByMap(CacheConstants.CACHE_PREFIX_CLIENT+id, map1);
-            }
-        }
+//
+//            //批量放入缓存
+//            Map<String, Object> map = cacheFeign.hGet(CacheConstants.CACHE_PREFIX_CLIENT + id);
+//            if (map==null || map.size() == 0) {
+//                Map<String, Object> map1 = JsonUtils.object2Map(tClientBusiness);
+//                cacheFeign.setHashMapByMap(CacheConstants.CACHE_PREFIX_CLIENT+id, map1);
+//            }
+//        }
         PageInfo<TClientBusiness> info = new PageInfo<>(tClientBusinesses);
         long total = info.getTotal();
         DataGridResult result = new DataGridResult(total, tClientBusinesses);

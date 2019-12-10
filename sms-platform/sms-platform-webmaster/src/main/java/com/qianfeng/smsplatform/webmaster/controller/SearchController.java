@@ -48,9 +48,15 @@ public class SearchController {
                 map.put("corpname",corpname);
                 Object sendTime1 = map.get("sendTime");
                 if(!StringUtils.isEmpty(sendTime1)) {
-                    Long sendTime = Long.parseLong(sendTime1.toString());
-                    String sendTimeStr = DateUtils.longToStr(sendTime);
-                    map.put("sendTimeStr", sendTimeStr);
+                    Long sendTime = null;
+                    try {
+                        //因为sendTime中数据很多都是空的，所以捕获一下异常
+                        sendTime = Long.parseLong(sendTime1.toString());
+                        String sendTimeStr = DateUtils.longToStr(sendTime);
+                        map.put("sendTimeStr", sendTimeStr);
+                    } catch (NumberFormatException e) {
+                        map.put("sendTimeStr", "");
+                    }
                 }else {
                     map.put("sendTimeStr", "");
                 }

@@ -21,5 +21,9 @@ public class MQConfig {
     public Queue queue1() {
         return new Queue(RabbitMqConsants.TOPIC_PUSH_SMS_REPORT);
     }
+    @Bean
+    public Queue queue2(){
+        return new Queue(RabbitMqConsants.TOPIC_UPDATE_SMS_REPORT);
+    }
 
 }

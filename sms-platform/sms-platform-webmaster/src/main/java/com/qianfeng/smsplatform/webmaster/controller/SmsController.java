@@ -15,6 +15,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Date;
+
 @Controller
 public class SmsController {
 
@@ -38,6 +40,7 @@ public class SmsController {
             submit.setDestMobile(mobiles[i]); //手机号
             submit.setMessageContent(content); //内容
             submit.setSource(2);
+            submit.setSendTime(new Date());
             rabbitTemplate.convertAndSend(RabbitMqConsants.TOPIC_PRE_SEND, submit);
         }
         return R.ok();

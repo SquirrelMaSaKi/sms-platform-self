@@ -2,10 +2,10 @@ package com.qianfeng.smsplatform.search.controller;
 
 import com.qianfeng.smsplatform.search.service.SearchApi;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +16,7 @@ import java.util.Map;
  * @Date 2019/12/7 15:47
  * @Description TODO
  */
-@Controller
+@RestController
 @RequestMapping("/search")
 public class SearchController {
 
@@ -34,7 +34,7 @@ public class SearchController {
     }
 
     @RequestMapping(value = "/statStatus", method = RequestMethod.POST)
-    public Map<String, Long> statSendStatus(@RequestParam("paras") String paras){
-        return null;
+    public Map<String, Long> statSendStatus(@RequestParam("paras") String paras) throws Exception {
+        return searchApi.stataStatSendStatus(paras);
     }
 }

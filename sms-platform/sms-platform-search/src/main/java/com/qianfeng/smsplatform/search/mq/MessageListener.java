@@ -38,12 +38,17 @@ public class MessageListener {
         //json字符串转对象或者转map用, 如果从队列中收到的为对象, 就不用转了
 
         //Standard_Submit standard_submit = objectMapper.readValue(message, Standard_Submit.class);
+        log.debug("接收到的消息:{}",message);
         String json = objectMapper.writeValueAsString(message);
-        log.debug(json);
         searchApi.add(json);
     }
 
-    @RabbitListener(queues = RabbitMqConsants.TOPIC_PUSH_SMS_REPORT, concurrency = "10")
+    /**
+     * 更新状态报告
+     * @param report
+     * @throws Exception
+     */
+    @RabbitListener(queues = RabbitMqConsants.TOPIC_UPDATE_SMS_REPORT, concurrency = "10")
     public void reportQueueListener(Standard_Report report) throws Exception {
         Standard_Submit submit = new Standard_Submit();
         submit.setDestMobile(report.getMobile());
