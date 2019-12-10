@@ -13,7 +13,7 @@ public class SendFailListener {
     private TReportService tReportService;
 
     //监听发送失败队列
-    @RabbitListener(queues = RabbitMqConsants.TOPIC_PUSH_ERROR, concurrency = "10")
+    @RabbitListener(queues = RabbitMqConsants.TOPIC_PUSH_ERROR)
     public void getSendFailMessage(Standard_Report report) {
         tReportService.insert(report);
     }

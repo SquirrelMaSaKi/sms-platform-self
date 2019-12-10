@@ -1,8 +1,8 @@
 #官方
-eureka:
-  client:
-    serviceUrl:
-      defaultZone: http://admin:123456@localhost:8000/eureka/
+#eureka:
+#  client:
+#    serviceUrl:
+#      defaultZone: http://admin:123456@localhost:8000/eureka/
 
 #裴少伯
 #eureka:
@@ -11,10 +11,10 @@ eureka:
 #      defaultZone: http://admin:123456@10.9.21.178:8000/eureka/
 
 #徐诗豪
-#eureka:
-#  client:
-#    serviceUrl:
-#      defaultZone: http://admin:123456@10.9.21.230:8000/eureka/
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://admin:123456@10.9.21.230:8000/eureka/
 
 #zookeeper注册中心配置
 regCenter:

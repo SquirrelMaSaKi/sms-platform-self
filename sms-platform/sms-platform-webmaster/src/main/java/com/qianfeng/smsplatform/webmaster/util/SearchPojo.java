@@ -20,5 +20,4 @@ public class SearchPojo {
     private String highLightPostTag;
 
     private String messageContent;
-
 }
