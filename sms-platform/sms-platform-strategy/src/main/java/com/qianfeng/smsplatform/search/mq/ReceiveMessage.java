@@ -57,7 +57,7 @@ import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.*;
 */
 @Slf4j
 @Component
-@RabbitListener(queues = TOPIC_PRE_SEND, concurrency = "100")   //多线程
+@RabbitListener(queues = TOPIC_PRE_SEND, concurrency = "20")   //多线程
 public class ReceiveMessage {
     @Autowired
     private Map<String, FilterService> filterServicesMap;    //所有实现了FilterService接口的类对象都会在map中,key为servicename,value为对象
@@ -131,6 +131,10 @@ public class ReceiveMessage {
         System.out.println("传入网关队列");
         Map map =cacheService.findByKey3(CACHE_PREFIX_ROUTER + message.getClientID());  //通过clientid获取redis的hash
         log.info("map"+map);
+
+        channel.queueDeclare(TOPIC_SMS_SEND_LOG,true,false,false,null);
+        send.sendMessage(TOPIC_SMS_SEND_LOG, message);
+
         channel.queueDeclare(TOPIC_SMS_GATEWAY+map.get("channelid"),true,false,false,null);
         send.sendMessage(TOPIC_SMS_GATEWAY+map.get("channelid"), message);
 
