@@ -1,8 +1,10 @@
 package com.qianfeng.smsplatform.common;
 
+import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 import com.qianfeng.smsplatform.search.SearchServiceApplication;
+import com.qianfeng.smsplatform.search.dto.SmsStatusDTO;
 import com.qianfeng.smsplatform.search.service.SearchApi;
 import com.qianfeng.smsplatform.search.util.SearchPojo;
 import org.junit.runner.RunWith;
@@ -11,6 +13,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -81,9 +84,11 @@ public class Test {
         System.err.println();
     }
 
-    public void test(){
-        Date a = new Date();
-        long l = Long.parseLong(a.toString());
-        System.err.println(l);
+    @org.junit.Test
+    public void test() throws IOException {
+        SmsStatusDTO smsStatusDTO = new SmsStatusDTO();
+        String s = JSON.toJSONString(smsStatusDTO);
+        Map<String, Long> stringLongMap = searchApi.stataStatSendStatus(s);
+        System.err.println();
     }
 }
