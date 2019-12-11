@@ -125,7 +125,7 @@ public class ReceiveMessage {
             report.setSrcID(message.getSrcSequenceId());
             log.info("report"+report);
             channel.queueDeclare(TOPIC_PUSH_SMS_REPORT,true,false,false,null);
-            send.sendMessage2(TOPIC_PUSH_SMS_REPORT, report);
+//            send.sendMessage2(TOPIC_PUSH_SMS_REPORT, report);   //成功的到网关，网管会推送状态报告
         }
 
         System.out.println("传入网关队列");
