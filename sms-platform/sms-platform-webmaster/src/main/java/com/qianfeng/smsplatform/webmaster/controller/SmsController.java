@@ -39,8 +39,8 @@ public class SmsController {
             submit.setClientID(tAdminUser.getClientid()); //客户端id
             submit.setDestMobile(mobiles[i]); //手机号
             submit.setMessageContent(content); //内容
-            submit.setSource(2);
-            submit.setSendTime(new Date());
+            submit.setSource(2); //发送源
+            submit.setSendTime(new Date()); //时间
             rabbitTemplate.convertAndSend(RabbitMqConsants.TOPIC_PRE_SEND, submit);
         }
         return R.ok();
