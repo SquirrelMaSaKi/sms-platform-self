@@ -94,7 +94,7 @@ public class PhaseFilterService implements FilterService {
                 return message;
             }else{
                 log.error("没有对应省市信息");
-                message.setOperatorId(0);
+//                message.setOperatorId(0);
                 return message;
             }
 

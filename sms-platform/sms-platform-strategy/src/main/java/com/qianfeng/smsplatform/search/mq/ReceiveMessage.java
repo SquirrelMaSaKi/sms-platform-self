@@ -57,7 +57,7 @@ import static com.qianfeng.smsplatform.common.constants.RabbitMqConsants.*;
 */
 @Slf4j
 @Component
-@RabbitListener(queues = TOPIC_PRE_SEND, concurrency = "10")   //多线程
+@RabbitListener(queues = TOPIC_PRE_SEND, concurrency = "20")   //多线程
 public class ReceiveMessage {
     @Autowired
     private Map<String, FilterService> filterServicesMap;    //所有实现了FilterService接口的类对象都会在map中,key为servicename,value为对象
@@ -108,6 +108,7 @@ public class ReceiveMessage {
                 System.out.println("写入下发日志");
                 report.setState(2);
                 log.info("report"+report);
+                log.info("message"+message);
                 channel.queueDeclare(TOPIC_SMS_SEND_LOG,true,false,false,null);
                 send.sendMessage(TOPIC_SMS_SEND_LOG, message);
                 return;
@@ -125,12 +126,14 @@ public class ReceiveMessage {
             report.setSrcID(message.getSrcSequenceId());
             log.info("report"+report);
             channel.queueDeclare(TOPIC_PUSH_SMS_REPORT,true,false,false,null);
-            send.sendMessage2(TOPIC_PUSH_SMS_REPORT, report);
+//            send.sendMessage2(TOPIC_PUSH_SMS_REPORT, report);   //成功的到网关，网关会推送状态报告
         }
 
         System.out.println("传入网关队列");
         Map map =cacheService.findByKey3(CACHE_PREFIX_ROUTER + message.getClientID());  //通过clientid获取redis的hash
         log.info("map"+map);
+//        channel.queueDeclare(TOPIC_SMS_SEND_LOG,true,false,false,null);
+//        send.sendMessage(TOPIC_SMS_SEND_LOG, message);  //成功日志不需要写，网关会写
         channel.queueDeclare(TOPIC_SMS_GATEWAY+map.get("channelid"),true,false,false,null);
         send.sendMessage(TOPIC_SMS_GATEWAY+map.get("channelid"), message);
 
