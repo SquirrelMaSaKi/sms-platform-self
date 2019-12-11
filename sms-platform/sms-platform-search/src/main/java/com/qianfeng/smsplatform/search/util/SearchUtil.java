@@ -132,7 +132,7 @@ public class SearchUtil {
 
         //号码查询
         if(mobile != null && mobile !=""){
-            srcNumberTerm = new TermQueryBuilder("mobile",mobile.toString());
+            srcNumberTerm = new TermQueryBuilder("destMobile",mobile.toString());
             boolQueryBuilder.must(srcNumberTerm);
         }
         //关键字查询
@@ -155,7 +155,7 @@ public class SearchUtil {
             boolQueryBuilder.must(receiveTimeQuery);
         }
         //根据clientID查询
-        if (clientID != null) {
+        if (clientID != null & clientID!="") {
             clientIDTerm = new TermQueryBuilder("clientID", clientID.toString());
             boolQueryBuilder.must(clientIDTerm);
         }
