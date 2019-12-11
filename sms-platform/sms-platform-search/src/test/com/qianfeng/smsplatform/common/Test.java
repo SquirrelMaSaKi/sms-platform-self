@@ -47,27 +47,20 @@ public class Test {
     @org.junit.Test
     public void testInsert() throws Exception {
         Standard_Submit bean = new Standard_Submit();
-        bean.setClientID(17700004);
-        bean.setSrcNumber("1518045234");
-        bean.setMessagePriority((short)11);
-        bean.setSrcSequenceId(12348765);
-        bean.setGatewayID(8888);
-        bean.setProductID(8888);
-        bean.setDestMobile("8888888");
-        bean.setMessageContent("新华社澳门12月8日电 题：推进“一国两制”实践在澳门行稳致远——访澳门特区候任行政长官贺一诚\n" +
-                "“希望中央政府及各部门能够继续给予澳门特区适当的帮助，更大贡献。" +
-                "”贺一诚说。（完）");
-        bean.setErrorCode("500");
+        bean.setClientID(0);
+        bean.setDestMobile("15180451544");
+        bean.setMessageContent("测试2");
         bean.setSendTime(new Date());
-        bean.setOperatorId(8888);
-        bean.setProvinceId(8888);
-        bean.setCityId(8);
-        bean.setSource(8);
+        // bean.setErrorCode("500");
+        // bean.setSrcNumber("2135234");
+        // bean.setSrcSequenceId(12348765);
+        // bean.setGatewayID(8888);
+        // bean.setProductID(8888);
+        // bean.setOperatorId(8888);
+        // bean.setProvinceId(8888);
+        // bean.setCityId(8);
+        // bean.setSource(8);
         String json = objectMapper.writeValueAsString(bean);
-        for (int i = 1; i < 11; i++) {
-            bean.setSrcNumber("1518045234" + i);
-            searchApi.add(json);
-        }
         searchApi.add(json);
     }
 
@@ -79,6 +72,7 @@ public class Test {
         searchPojo.setEndTime(System.currentTimeMillis());
         searchPojo.setStart(1);
         searchPojo.setRows(10);
+        searchPojo.setMobile("15180451544");
         String json = objectMapper.writeValueAsString(searchPojo);
         List<Map> search = searchApi.search(json);
         System.err.println();
