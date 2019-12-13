@@ -3,7 +3,6 @@ package com.qianfeng.smsplatform.search.service.impl;
 import com.alibaba.fastjson.JSON;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
-import com.qianfeng.smsplatform.search.dto.SmsStatusDTO;
 import com.qianfeng.smsplatform.search.service.SearchApi;
 import com.qianfeng.smsplatform.search.util.SearchPojo;
 import com.qianfeng.smsplatform.search.util.SearchUtil;
@@ -23,9 +22,7 @@ import org.elasticsearch.client.RestHighLevelClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.text.Text;
 import org.elasticsearch.common.xcontent.XContentType;
-import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
@@ -33,7 +30,6 @@ import org.elasticsearch.search.aggregations.AggregationBuilders;
 import org.elasticsearch.search.aggregations.Aggregations;
 import org.elasticsearch.search.aggregations.bucket.terms.Terms;
 import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
-import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCount;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
@@ -44,6 +40,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -119,7 +116,7 @@ public class SearchApiImpl implements SearchApi {
         int start  = 0;
         int rows = 0;
         if(searchPojo.getStart() == 0){
-            start = 1;
+            start = 0;
         }else{
             start = searchPojo.getStart();
         }
@@ -240,59 +237,29 @@ public class SearchApiImpl implements SearchApi {
      * @throws IOException
      */
     @Override
-    public Map<String, Long> stataStatSendStatus(String paras) throws IOException {
-        SmsStatusDTO smsStatusDTO = JSON.parseObject(paras, SmsStatusDTO.class);
-        Map<String, Long> statresule = new HashMap<>();
-        //成功0
-        int success=0;
-        //未返回1
-        int unreturn=0;
-        //失败2
-        int failure=0;
-        SearchRequest request = new SearchRequest();
-
-        SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
-        //聚合查询的时候默认查询数据是10条，因此在此指定查询数据条数。
-        searchSourceBuilder.size(100);
-        RangeQueryBuilder sendTime = null;
-        BoolQueryBuilder must = new BoolQueryBuilder();
-        if (smsStatusDTO.getStartTime() != null && smsStatusDTO.getEndTime() != null) {
-            sendTime=QueryBuilders.rangeQuery("sendTime").from(smsStatusDTO.getStartTime()).to(smsStatusDTO.getEndTime());
-            must.must(sendTime);
-        } else if (smsStatusDTO.getStartTime() != null && smsStatusDTO.getEndTime() == null) {
-            sendTime=QueryBuilders.rangeQuery("sendTime").gte(smsStatusDTO.getStartTime());
-            must.must(sendTime);
-        }else {
-            sendTime=QueryBuilders.rangeQuery("sendTime").lte(smsStatusDTO.getEndTime());
-            must.must(sendTime);
-        }
-        searchSourceBuilder.query(must);
-        //聚合查询，按照reportState分组，统计值的个数
-        TermsAggregationBuilder aggregation = AggregationBuilders.terms("reportState")
-                .field("reportState");
-        //第一个是聚合结果的名字
-        aggregation.subAggregation(AggregationBuilders.count("reportStateCount")
-                .field("reportState"));
+    public Map<String, Long> stataStatSendStatus(String paras) throws IOException, ParseException {
+        HashMap<String, Long> map = new HashMap<>();
+        SearchPojo searchPojo = objectMapper.readValue(paras, SearchPojo.class);
+        SearchSourceBuilder searchSourceBuilder = SearchUtil.getSearchSourceBuilder(searchPojo);
+        TermsAggregationBuilder aggregation = AggregationBuilders.terms("byReportState").field("reportState");
+        aggregation.subAggregation(AggregationBuilders.count("count").field("reportState"));
         searchSourceBuilder.aggregation(aggregation);
-        request.source(searchSourceBuilder);
-        log.debug("request source：{}",request.source());
-        SearchResponse response = client.search(request, RequestOptions.DEFAULT);
-        SearchHits hits = response.getHits();
-        log.debug("hits:{}", hits);
-        SearchHit[] searchHits = hits.getHits();
+        //完善request 相关信息
+        SearchRequest searchRequest = new SearchRequest(indexName);
+        searchRequest.types(typeName);
+        searchRequest.source(searchSourceBuilder);
+        SearchResponse response = client.search(searchRequest, RequestOptions.DEFAULT);
 
         Aggregations aggregations = response.getAggregations();
-        Terms byCompanyAggregation = aggregations.get("reportState");
-        List<? extends Terms.Bucket> buckets = byCompanyAggregation.getBuckets();
-        for (int i = 0; i < buckets.size(); i++) {
-            Terms.Bucket elasticBucket = buckets.get(i);
-            //分组时每组的名字，这里不需要，但留作笔记
-            Object key = elasticBucket.getKey();
-            ValueCount count = elasticBucket.getAggregations().get("reportStateCount");
-            long value = count.getValue();
-            statresule.put(""+i,value);
+        Terms terms = aggregations.get("byReportState");
+        List<? extends Terms.Bucket> buckets = terms.getBuckets();
+        for (Terms.Bucket bucket : buckets) {
+            String keyAsString = bucket.getKeyAsString();
+            long docCount = bucket.getDocCount();
+            map.put(keyAsString, docCount);
         }
-        return statresule;
+        logger.debug(map.toString());
+        return map;
     }
 
 }

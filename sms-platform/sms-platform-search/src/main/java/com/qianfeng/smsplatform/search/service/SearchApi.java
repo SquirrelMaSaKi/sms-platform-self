@@ -3,6 +3,7 @@ package com.qianfeng.smsplatform.search.service;
 import com.qianfeng.smsplatform.common.model.Standard_Submit;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.List;
 import java.util.Map;
 
@@ -56,5 +57,5 @@ public interface SearchApi {
      */
     void update(Standard_Submit submit) throws Exception;
 
-    Map<String, Long> stataStatSendStatus (String paras) throws IOException ;
+    Map<String, Long> stataStatSendStatus (String paras) throws IOException, ParseException;
 }

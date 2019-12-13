@@ -14,6 +14,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.springframework.test.context.web.WebAppConfiguration;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -67,19 +68,18 @@ public class Test {
     @org.junit.Test
     public void testGet() throws Exception {
         SearchPojo searchPojo = new SearchPojo();
-        // searchPojo.setKeyword("88888");
+        // searchPojo.setKeyword("祖国");
         searchPojo.setStartTime(0L);
         searchPojo.setEndTime(System.currentTimeMillis());
-        searchPojo.setStart(1);
-        searchPojo.setRows(10);
-        searchPojo.setMobile("15180451544");
+        searchPojo.setStart(0);
+        searchPojo.setRows(100);
         String json = objectMapper.writeValueAsString(searchPojo);
         List<Map> search = searchApi.search(json);
         System.err.println();
     }
 
     @org.junit.Test
-    public void test() throws IOException {
+    public void test() throws IOException, ParseException {
         SmsStatusDTO smsStatusDTO = new SmsStatusDTO();
         String s = JSON.toJSONString(smsStatusDTO);
         Map<String, Long> stringLongMap = searchApi.stataStatSendStatus(s);
