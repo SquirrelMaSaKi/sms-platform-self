@@ -106,7 +106,7 @@ public class ReceiveMessage {
                     send.sendMessage2(TOPIC_PUSH_SMS_REPORT, report);
                 }
                 System.out.println("写入下发日志");
-                report.setState(2);
+                message.setReportState(2);
                 log.info("report"+report);
                 log.info("message"+message);
                 channel.queueDeclare(TOPIC_SMS_SEND_LOG,true,false,false,null);
@@ -119,7 +119,7 @@ public class ReceiveMessage {
 
         //无错误
         if (message.getSource()==1) {
-            report.setState(0);
+            report.setState(1);
             report.setErrorCode(message.getErrorCode());
             report.setMobile(message.getDestMobile());
             report.setClientID(message.getClientID());
