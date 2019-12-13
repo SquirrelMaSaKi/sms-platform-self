@@ -101,5 +101,6 @@ public class RabbitConfig {
                 .with(TOPIC_UPDATE_SMS_REPORT);
     }
 
+
 }
 

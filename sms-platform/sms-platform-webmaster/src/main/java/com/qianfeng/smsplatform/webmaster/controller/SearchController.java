@@ -1,5 +1,7 @@
 package com.qianfeng.smsplatform.webmaster.controller;
 
+import com.qianfeng.smsplatform.common.constants.CacheConstants;
+import com.qianfeng.smsplatform.webmaster.feign.CacheFeign;
 import com.qianfeng.smsplatform.webmaster.pojo.TAdminUser;
 import com.qianfeng.smsplatform.webmaster.service.api.SearchService;
 import com.qianfeng.smsplatform.webmaster.util.*;
@@ -23,8 +25,8 @@ public class SearchController {
     @Autowired
     private SearchService searchService;
 
-//    @Autowired
-//    private CacheService cacheService;
+   @Autowired
+   private CacheFeign cacheFeign;
 
 
     @RequestMapping("/sys/search/list")
@@ -42,9 +44,9 @@ public class SearchController {
             List<Map> list = searchService.searchLog(str);
             for (Map map : list) {
                 String clientID = String.valueOf(map.get("clientID"));
-//                Map<String, String> hmget = cacheService.hmget("CLIENT:" + clientID);
-//                String corpname = hmget.get("corpname");
-                String corpname ="";
+
+               Map<String, Object> hmget = cacheFeign.hGet(CacheConstants.CACHE_PREFIX_CLIENT + clientID);
+                String corpname = (String) hmget.get("corpname");
                 map.put("corpname",corpname);
                 Object sendTime1 = map.get("sendTime");
                 if(!StringUtils.isEmpty(sendTime1)) {

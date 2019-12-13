@@ -29,6 +29,11 @@ import org.elasticsearch.index.query.RangeQueryBuilder;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.SearchHits;
+import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.Aggregations;
+import org.elasticsearch.search.aggregations.bucket.terms.Terms;
+import org.elasticsearch.search.aggregations.bucket.terms.TermsAggregationBuilder;
+import org.elasticsearch.search.aggregations.metrics.valuecount.ValueCount;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightBuilder;
 import org.elasticsearch.search.fetch.subphase.highlight.HighlightField;
@@ -238,21 +243,19 @@ public class SearchApiImpl implements SearchApi {
     public Map<String, Long> stataStatSendStatus(String paras) throws IOException {
         SmsStatusDTO smsStatusDTO = JSON.parseObject(paras, SmsStatusDTO.class);
         Map<String, Long> statresule = new HashMap<>();
-        int success=0;//成功0
-        int unreturn=0;//未返回1
-        int failure=0;//失败2
+        //成功0
+        int success=0;
+        //未返回1
+        int unreturn=0;
+        //失败2
+        int failure=0;
         SearchRequest request = new SearchRequest();
 
         SearchSourceBuilder searchSourceBuilder = new SearchSourceBuilder();
         //聚合查询的时候默认查询数据是10条，因此在此指定查询数据条数。
         searchSourceBuilder.size(100);
         RangeQueryBuilder sendTime = null;
-        TermQueryBuilder clientId=null;
         BoolQueryBuilder must = new BoolQueryBuilder();
-        if (clientId != null) {
-            clientId = QueryBuilders.termQuery("clientId", smsStatusDTO.getClientID());
-            must.must(clientId);
-        }
         if (smsStatusDTO.getStartTime() != null && smsStatusDTO.getEndTime() != null) {
             sendTime=QueryBuilders.rangeQuery("sendTime").from(smsStatusDTO.getStartTime()).to(smsStatusDTO.getEndTime());
             must.must(sendTime);
@@ -264,24 +267,31 @@ public class SearchApiImpl implements SearchApi {
             must.must(sendTime);
         }
         searchSourceBuilder.query(must);
+        //聚合查询，按照reportState分组，统计值的个数
+        TermsAggregationBuilder aggregation = AggregationBuilders.terms("reportState")
+                .field("reportState");
+        //第一个是聚合结果的名字
+        aggregation.subAggregation(AggregationBuilders.count("reportStateCount")
+                .field("reportState"));
+        searchSourceBuilder.aggregation(aggregation);
         request.source(searchSourceBuilder);
-        SearchResponse search = client.search(request, RequestOptions.DEFAULT);
-        SearchHits hits = search.getHits();
+        log.debug("request source：{}",request.source());
+        SearchResponse response = client.search(request, RequestOptions.DEFAULT);
+        SearchHits hits = response.getHits();
+        log.debug("hits:{}", hits);
         SearchHit[] searchHits = hits.getHits();
-        for (SearchHit searchHit : searchHits) {
-            Map<String, Object> sourceAsMap = searchHit.getSourceAsMap();
-            int reportState =Integer.parseInt(String.valueOf(sourceAsMap.get("reportState"))) ;
-            switch (reportState) {
-                case 0:success++;break;
-                case 1:unreturn++;break;
-                case 2:failure++;break;
-            }
 
+        Aggregations aggregations = response.getAggregations();
+        Terms byCompanyAggregation = aggregations.get("reportState");
+        List<? extends Terms.Bucket> buckets = byCompanyAggregation.getBuckets();
+        for (int i = 0; i < buckets.size(); i++) {
+            Terms.Bucket elasticBucket = buckets.get(i);
+            //分组时每组的名字，这里不需要，但留作笔记
+            Object key = elasticBucket.getKey();
+            ValueCount count = elasticBucket.getAggregations().get("reportStateCount");
+            long value = count.getValue();
+            statresule.put(""+i,value);
         }
-        statresule.put("0",new Long(success));
-        statresule.put("1", new Long(unreturn));
-        statresule.put("2", new Long(failure));
-        System.err.println("状态信息："+success+"   "+unreturn+"   "+failure);
         return statresule;
     }
 
